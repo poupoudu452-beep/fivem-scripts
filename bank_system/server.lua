@@ -13,7 +13,7 @@ local function getIdentifier(source)
     return 'player:' .. GetPlayerName(source) .. '_' .. source
 end
 
--- ─── Création table transactions ──────────────────────────────────────────
+-- ─── Création tables ─────────────────────────────────────────────────────────
 CreateThread(function()
     exports.oxmysql:execute([[
         CREATE TABLE IF NOT EXISTS `bank_transactions` (
@@ -235,5 +235,196 @@ function refreshBankData(targetSource, identifier)
         end
     )
 end
+
+-- ═══════════════════════════════════════════════════════════════════════════
+--  ENTREPRISE : compte bancaire d'entreprise (intégré dans bank_system)
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- Helper : vérifier si le joueur est commandant/gérant d'une entreprise
+local function getCompanyInfo(source)
+    local identifier = getIdentifier(source)
+    -- Vérifier si le joueur a un job1 qui correspond à une entreprise avec compte
+    local row = exports.oxmysql:single_async(
+        'SELECT `job1` FROM `characters` WHERE `identifier` = ?',
+        { identifier }
+    )
+    if not row or not row.job1 or row.job1 == '' or row.job1 == 'Chomage' then
+        return nil
+    end
+
+    local jobName = row.job1
+
+    -- Vérifier si le joueur est commandant/gérant via police_job ou autre système
+    local isCommander = false
+    local ok, val = pcall(function()
+        return exports['police_job']:IsCommanderServer(source)
+    end)
+    if ok and val then
+        isCommander = true
+    end
+
+    if not isCommander then return nil end
+
+    return { jobName = jobName, identifier = identifier }
+end
+
+-- Récupérer les données du compte entreprise
+RegisterNetEvent('bank:requestCompanyData')
+AddEventHandler('bank:requestCompanyData', function()
+    local source = source
+    local company = getCompanyInfo(source)
+
+    if not company then
+        TriggerClientEvent('bank:receiveCompanyData', source, nil)
+        return
+    end
+
+    local jobName = company.jobName
+
+    -- Chercher le compte entreprise dans police_company_bank
+    exports.oxmysql:single(
+        'SELECT `balance` FROM `police_company_bank` WHERE `id` = 1',
+        {},
+        function(bankRow)
+            local balance = (bankRow and bankRow.balance) or 0
+
+            -- Récupérer les transactions entreprise
+            exports.oxmysql:fetch(
+                'SELECT `type`, `amount`, `description`, `date` FROM `police_company_transactions` ORDER BY `date` DESC LIMIT 50',
+                {},
+                function(transactions)
+                    TriggerClientEvent('bank:receiveCompanyData', source, {
+                        jobName      = jobName,
+                        balance      = balance,
+                        transactions = transactions or {},
+                    })
+                end
+            )
+        end
+    )
+end)
+
+-- Dépôt sur le compte entreprise
+RegisterNetEvent('bank:companyDeposit')
+AddEventHandler('bank:companyDeposit', function(amount)
+    local source = source
+    local company = getCompanyInfo(source)
+    if not company then
+        TriggerClientEvent('bank:notify', source, 'Acces refuse.', 'error')
+        return
+    end
+
+    amount = tonumber(amount) or 0
+    if amount <= 0 then
+        TriggerClientEvent('bank:notify', source, 'Montant invalide.', 'error')
+        return
+    end
+
+    -- Vérifier l'argent sur le joueur
+    local ok, totalMoney = pcall(function()
+        return exports['inv_system']:countItem(source, 'money')
+    end)
+    if not ok then totalMoney = 0 end
+    totalMoney = totalMoney or 0
+
+    if totalMoney < amount then
+        TriggerClientEvent('bank:notify', source, 'Pas assez d\'argent sur vous. ($' .. totalMoney .. ' disponible)', 'error')
+        return
+    end
+
+    -- Retirer l'argent du joueur
+    local okRemove, removed = pcall(function()
+        return exports['inv_system']:removeItem(source, 'money', amount)
+    end)
+    if not okRemove or not removed then
+        TriggerClientEvent('bank:notify', source, 'Erreur lors du retrait.', 'error')
+        return
+    end
+
+    -- Ajouter au compte entreprise
+    exports.oxmysql:execute(
+        'UPDATE `police_company_bank` SET `balance` = `balance` + ? WHERE `id` = 1',
+        { amount },
+        function()
+            -- Logger la transaction
+            local playerName = GetPlayerName(source) or 'Inconnu'
+            exports.oxmysql:insert(
+                'INSERT INTO `police_company_transactions` (`type`, `amount`, `author`, `description`) VALUES (?, ?, ?, ?)',
+                { 'deposit', amount, playerName, 'Depot par ' .. playerName }
+            )
+            TriggerClientEvent('bank:notify', source, 'Depot de $' .. amount .. ' sur le compte entreprise.', 'success')
+            -- Rafraîchir les données
+            TriggerEvent('bank:requestCompanyData_internal', source)
+        end
+    )
+end)
+
+-- Retrait du compte entreprise
+RegisterNetEvent('bank:companyWithdraw')
+AddEventHandler('bank:companyWithdraw', function(amount)
+    local source = source
+    local company = getCompanyInfo(source)
+    if not company then
+        TriggerClientEvent('bank:notify', source, 'Acces refuse.', 'error')
+        return
+    end
+
+    amount = tonumber(amount) or 0
+    if amount <= 0 then
+        TriggerClientEvent('bank:notify', source, 'Montant invalide.', 'error')
+        return
+    end
+
+    -- Retrait atomique
+    exports.oxmysql:execute(
+        'UPDATE `police_company_bank` SET `balance` = `balance` - ? WHERE `id` = 1 AND `balance` >= ?',
+        { amount, amount },
+        function(affectedRows)
+            if not affectedRows or affectedRows == 0 then
+                TriggerClientEvent('bank:notify', source, 'Solde entreprise insuffisant.', 'error')
+                return
+            end
+
+            -- Donner l'argent au joueur
+            TriggerEvent('inv:giveStarterItem', source, 'money', amount)
+
+            local playerName = GetPlayerName(source) or 'Inconnu'
+            exports.oxmysql:insert(
+                'INSERT INTO `police_company_transactions` (`type`, `amount`, `author`, `description`) VALUES (?, ?, ?, ?)',
+                { 'withdrawal', amount, playerName, 'Retrait par ' .. playerName }
+            )
+            TriggerClientEvent('bank:notify', source, 'Retrait de $' .. amount .. ' du compte entreprise.', 'success')
+            TriggerEvent('bank:requestCompanyData_internal', source)
+        end
+    )
+end)
+
+-- Event interne pour rafraîchir les données entreprise
+AddEventHandler('bank:requestCompanyData_internal', function(targetSource)
+    exports.oxmysql:single(
+        'SELECT `balance` FROM `police_company_bank` WHERE `id` = 1',
+        {},
+        function(bankRow)
+            local balance = (bankRow and bankRow.balance) or 0
+            exports.oxmysql:fetch(
+                'SELECT `type`, `amount`, `description`, `date` FROM `police_company_transactions` ORDER BY `date` DESC LIMIT 50',
+                {},
+                function(transactions)
+                    -- Récupérer le nom du job
+                    local identifier = getIdentifier(targetSource)
+                    local charRow = exports.oxmysql:single_async(
+                        'SELECT `job1` FROM `characters` WHERE `identifier` = ?',
+                        { identifier }
+                    )
+                    TriggerClientEvent('bank:receiveCompanyData', targetSource, {
+                        jobName      = (charRow and charRow.job1) or 'Entreprise',
+                        balance      = balance,
+                        transactions = transactions or {},
+                    })
+                end
+            )
+        end
+    )
+end)
 
 print('[BankSystem] Server script charge.')

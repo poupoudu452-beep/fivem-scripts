@@ -3,6 +3,7 @@
 // ============================================================
 
 var bankData = null;
+var companyData = null;
 
 // ─── NUI Message Handler ─────────────────────────────────────
 window.addEventListener('message', function(event) {
@@ -18,6 +19,12 @@ window.addEventListener('message', function(event) {
     if (msg.action === 'close') {
         document.getElementById('bank-container').classList.add('hidden');
         bankData = null;
+        companyData = null;
+    }
+
+    if (msg.action === 'companyData') {
+        companyData = msg.companyData;
+        populateCompanyUI(companyData);
     }
 
     if (msg.action === 'error') {
@@ -28,11 +35,17 @@ window.addEventListener('message', function(event) {
     if (msg.action === 'success') {
         showOperationMsg('deposit', msg.message, 'success');
         showOperationMsg('withdraw', msg.message, 'success');
+        showOperationMsg('company-deposit', msg.message, 'success');
+        showOperationMsg('company-withdraw', msg.message, 'success');
         // Vider les inputs
         var depInput = document.getElementById('deposit-amount');
         var witInput = document.getElementById('withdraw-amount');
+        var cDepInput = document.getElementById('company-deposit-amount');
+        var cWitInput = document.getElementById('company-withdraw-amount');
         if (depInput) depInput.value = '';
         if (witInput) witInput.value = '';
+        if (cDepInput) cDepInput.value = '';
+        if (cWitInput) cWitInput.value = '';
     }
 });
 
@@ -227,6 +240,90 @@ function clearMessages() {
 }
 
 // ─── Fermer ──────────────────────────────────────────────────
+// ─── Entreprise : peupler l'UI ──────────────────────────────
+function populateCompanyUI(data) {
+    var navBtn = document.getElementById('nav-company');
+    if (!data) {
+        if (navBtn) navBtn.classList.add('hidden');
+        return;
+    }
+    // Afficher l'onglet Entreprise
+    if (navBtn) navBtn.classList.remove('hidden');
+
+    var nameEl = document.getElementById('company-name');
+    var balEl  = document.getElementById('company-balance');
+    if (nameEl) nameEl.textContent = data.jobName || 'Entreprise';
+    if (balEl)  balEl.textContent  = formatMoney(data.balance || 0);
+
+    renderCompanyTransactions('company-transactions-list', data.transactions, 50);
+}
+
+function renderCompanyTransactions(containerId, transactions, limit) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!transactions || transactions.length === 0) {
+        container.innerHTML = '<div class="empty-state">Aucune transaction</div>';
+        return;
+    }
+
+    var html = '';
+    var max = Math.min(transactions.length, limit || 50);
+
+    for (var i = 0; i < max; i++) {
+        var tx     = transactions[i];
+        var isDepo = tx.type === 'deposit';
+        var icon   = isDepo ? '⬇' : '⬆';
+        var cls    = isDepo ? 'deposit' : 'withdrawal';
+        var sign   = isDepo ? '+' : '-';
+        var amtCls = isDepo ? 'positive' : 'negative';
+        var desc   = tx.description || (isDepo ? 'Depot' : 'Retrait');
+
+        html += '<div class="tx-item">';
+        html += '  <div class="tx-icon ' + cls + '">' + icon + '</div>';
+        html += '  <div class="tx-info">';
+        html += '    <div class="tx-type">' + desc + '</div>';
+        html += '    <div class="tx-date">' + formatDate(tx.date) + '</div>';
+        html += '  </div>';
+        html += '  <div class="tx-amount ' + amtCls + '">' + sign + formatMoney(tx.amount) + '</div>';
+        html += '</div>';
+    }
+
+    container.innerHTML = html;
+}
+
+function doCompanyDeposit() {
+    var amount = parseInt(document.getElementById('company-deposit-amount').value) || 0;
+    if (amount <= 0) {
+        showOperationMsg('company-deposit', 'Entrez un montant valide.', 'error');
+        return;
+    }
+    clearMessages();
+    fetch('https://bank_system/companyDeposit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amount })
+    });
+}
+
+function doCompanyWithdraw() {
+    var amount = parseInt(document.getElementById('company-withdraw-amount').value) || 0;
+    if (amount <= 0) {
+        showOperationMsg('company-withdraw', 'Entrez un montant valide.', 'error');
+        return;
+    }
+    if (companyData && amount > companyData.balance) {
+        showOperationMsg('company-withdraw', 'Solde entreprise insuffisant.', 'error');
+        return;
+    }
+    clearMessages();
+    fetch('https://bank_system/companyWithdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amount })
+    });
+}
+
 function closeBank() {
     document.getElementById('bank-container').classList.add('hidden');
     fetch('https://bank_system/close', {

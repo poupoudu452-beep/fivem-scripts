@@ -76,6 +76,11 @@ function IsCommander(src)
     return data and data.grade_name == PoliceConfig.CommanderGrade
 end
 
+-- Export serveur pour bank_system
+exports('IsCommanderServer', function(src)
+    return IsCommander(src)
+end)
+
 function GetPoliceData(src)
     return PoliceOfficers[src]
 end

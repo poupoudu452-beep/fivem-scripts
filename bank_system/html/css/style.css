@@ -683,3 +683,89 @@ body {
 #bank-container:not(.hidden) {
     animation: fadeIn 0.3s ease;
 }
+
+/* ─── Entreprise Tab ──────────────────────────────────────── */
+.nav-btn-company {
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+    padding-top: 12px;
+}
+
+.nav-btn-company.active {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #3b82f6 !important;
+    border-left: 3px solid #3b82f6 !important;
+}
+
+.company-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+}
+
+.company-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.company-icon {
+    font-size: 28px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(59, 130, 246, 0.15);
+    border-radius: 10px;
+}
+
+.company-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.company-role {
+    font-size: 11px;
+    color: var(--text-dimmer);
+    margin-top: 2px;
+}
+
+.company-balance-box {
+    text-align: right;
+}
+
+.company-balance-label {
+    display: block;
+    font-size: 10px;
+    color: var(--text-dimmer);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.company-balance-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-top: 2px;
+}
+
+.company-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.company-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text);
+}
