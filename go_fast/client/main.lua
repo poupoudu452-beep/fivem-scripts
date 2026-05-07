@@ -368,12 +368,27 @@ function StartGoFastMission(dealerCoords, vehicleSpawnData, drugType, drugAmount
             EndGoFastTimeout()
         end
     end)
+
+    -- Thread : envoyer la position du joueur a la police toutes les 10 secondes
+    Citizen.CreateThread(function()
+        while missionActive do
+            Citizen.Wait(10000)
+            if missionActive then
+                local ped = PlayerPedId()
+                local c = GetEntityCoords(ped)
+                TriggerServerEvent('police:updateGoFastPosition', { x = c.x, y = c.y, z = c.z })
+            end
+        end
+    end)
 end
 
 -- Terminer la mission avec succès (appelé depuis pnj_interact via event)
 function EndGoFastSuccess()
     if not missionActive then return end
     missionActive = false
+
+    -- Notifier la police que le go fast est termine
+    TriggerServerEvent('police:goFastEnded')
 
     -- Retirer la clé du véhicule de l'inventaire
     if missionVehiclePlate then
@@ -418,6 +433,9 @@ end
 function EndGoFastTimeout()
     if not missionActive then return end
     missionActive = false
+
+    -- Notifier la police que le go fast est termine
+    TriggerServerEvent('police:goFastEnded')
 
     -- Retirer la clé du véhicule de l'inventaire
     if missionVehiclePlate then
@@ -466,6 +484,9 @@ function EndGoFastFail(receiverPed)
     if not missionActive then return end
     missionActive = false
     missionBlocked = true -- plus de go fast jusqu'au reboot
+
+    -- Notifier la police que le go fast est termine
+    TriggerServerEvent('police:goFastEnded')
 
     -- Retirer la clé du véhicule de l'inventaire
     if missionVehiclePlate then
