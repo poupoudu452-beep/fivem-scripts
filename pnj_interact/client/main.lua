@@ -2,6 +2,9 @@ local isThirdEyeActive = false
 local isDialogueOpen   = false
 local hoveredPed       = nil
 local hoveredPedName   = nil
+local hoveredPlayer    = nil
+local hoveredPlayerName = nil
+local hoveredPlayerServerId = nil
 local talkingToPed     = nil
 local pedNameCache     = {}
 local pedMaleCache     = {}
@@ -10,6 +13,7 @@ local pendingAction    = nil
 local pendingPed       = nil
 local tiedUpPeds       = {}
 local seatedPeds       = {}
+local policeActionTarget = nil
 
 -- Vérifier si un PNJ est un dealer (marqué par go_fast)
 function IsDealerPed(ped)
@@ -19,6 +23,27 @@ end
 -- Vérifier si un PNJ est le receveur de la mission go fast
 function IsReceiverPed(ped)
     return DecorExistOn(ped, 'gofast_receiver') and DecorGetInt(ped, 'gofast_receiver') == 1
+end
+
+-- Vérifier si un PNJ est le PNJ du commissariat
+function IsPoliceStationPed(ped)
+    return DecorExistOn(ped, 'police_station_npc') and DecorGetInt(ped, 'police_station_npc') == 1
+end
+
+-- Helpers police (pcall pour éviter les erreurs si police_job n'est pas chargé)
+function IsLocalPlayerPolice()
+    local ok, val = pcall(function() return exports['police_job']:IsPoliceClient() end)
+    return ok and val or false
+end
+
+function IsLocalPlayerOnDuty()
+    local ok, val = pcall(function() return exports['police_job']:IsOnDutyClient() end)
+    return ok and val or false
+end
+
+function IsLocalPlayerCommander()
+    local ok, val = pcall(function() return exports['police_job']:IsCommanderClient() end)
+    return ok and val or false
 end
 
 -- ═══════════════════════════════════════════
@@ -150,6 +175,8 @@ Citizen.CreateThread(function()
             if IsDisabledControlJustPressed(0, 24) then
                 if hoveredObject then
                     OpenObjectMenu()
+                elseif hoveredPlayer then
+                    TalkToPlayer()
                 elseif hoveredPed then
                     TalkToPed()
                 end
@@ -203,6 +230,9 @@ function ToggleThirdEye(state)
     else
         hoveredPed = nil
         hoveredPedName = nil
+        hoveredPlayer = nil
+        hoveredPlayerName = nil
+        hoveredPlayerServerId = nil
         hoveredObject    = nil
         hoveredObjectCfg = nil
 
@@ -218,14 +248,19 @@ end
 
 function HandleThirdEyeRaycast()
     local foundPed    = nil
+    local foundPlayer = nil
     local foundObject = nil
     local foundObjCfg = nil
 
     -- Raycast : flag 28 = peds(4) + vehicles(8) + objects(16)
     local hit, coords, entity = RaycastFromCamera(Config.MaxDistance)
     if hit and DoesEntityExist(entity) then
-        if IsEntityAPed(entity) and not IsPedAPlayer(entity) then
-            foundPed = entity
+        if IsEntityAPed(entity) then
+            if IsPedAPlayer(entity) then
+                foundPlayer = entity
+            else
+                foundPed = entity
+            end
         else
             -- Verifier si c'est un objet enregistre
             local model = GetEntityModel(entity)
@@ -237,8 +272,15 @@ function HandleThirdEyeRaycast()
     end
 
     -- Fallback : détection PNJ en face (si rien trouvé par raycast)
-    if not foundPed and not foundObject then
-        foundPed = GetClosestPedInFront(Config.MaxDistance)
+    if not foundPed and not foundPlayer and not foundObject then
+        local fallbackPed, fallbackIsPlayer = GetClosestPedInFront(Config.MaxDistance)
+        if fallbackPed then
+            if fallbackIsPlayer then
+                foundPlayer = fallbackPed
+            else
+                foundPed = fallbackPed
+            end
+        end
     end
 
     -- Objet enregistré détecté
@@ -246,9 +288,11 @@ function HandleThirdEyeRaycast()
         if foundObject ~= hoveredObject then
             hoveredObject    = foundObject
             hoveredObjectCfg = foundObjCfg
-            -- Masquer le PNJ s'il y en avait un
             hoveredPed     = nil
             hoveredPedName = nil
+            hoveredPlayer = nil
+            hoveredPlayerName = nil
+            hoveredPlayerServerId = nil
 
             SendNUIMessage({
                 action = 'hoverObject',
@@ -262,11 +306,45 @@ function HandleThirdEyeRaycast()
         SendNUIMessage({ action = 'unhoverPed' })
     end
 
-    -- PNJ détecté (seulement si pas d'objet)
-    if foundPed and not foundObject then
+    -- Joueur détecté (priorité sur les PNJ)
+    if foundPlayer and not foundObject then
+        if foundPlayer ~= hoveredPlayer then
+            hoveredPlayer = foundPlayer
+            -- Récupérer le server ID du joueur ciblé
+            local targetPlayerId = NetworkGetPlayerIndexFromPed(foundPlayer)
+            hoveredPlayerServerId = GetPlayerServerId(targetPlayerId)
+            hoveredPlayerName = GetPlayerName(targetPlayerId) or ('Joueur ' .. hoveredPlayerServerId)
+            -- Masquer le PNJ
+            hoveredPed = nil
+            hoveredPedName = nil
+
+            local isPolice = IsLocalPlayerPolice()
+            local isOnDuty = IsLocalPlayerOnDuty()
+
+            SendNUIMessage({
+                action      = 'hoverPed',
+                pedName     = hoveredPlayerName,
+                isPlayer    = true,
+                isPolice    = isPolice and isOnDuty,
+            })
+        end
+    elseif not foundPlayer then
+        if hoveredPlayer ~= nil then
+            hoveredPlayer = nil
+            hoveredPlayerName = nil
+            hoveredPlayerServerId = nil
+            SendNUIMessage({ action = 'unhoverPed' })
+        end
+    end
+
+    -- PNJ détecté (seulement si pas d'objet et pas de joueur)
+    if foundPed and not foundObject and not foundPlayer then
         if foundPed ~= hoveredPed then
             hoveredPed = foundPed
             hoveredPedName = GetPedName(foundPed)
+            hoveredPlayer = nil
+            hoveredPlayerName = nil
+            hoveredPlayerServerId = nil
 
             local trust = nil
             local isReceiver = IsReceiverPed(foundPed)
@@ -282,7 +360,7 @@ function HandleThirdEyeRaycast()
                 trust       = trust,
             })
         end
-    elseif not foundPed and not foundObject then
+    elseif not foundPed and not foundPlayer and not foundObject then
         if hoveredPed ~= nil then
             hoveredPed = nil
             hoveredPedName = nil
@@ -315,12 +393,13 @@ function GetClosestPedInFront(maxDist)
     local playerFwd = GetEntityForwardVector(playerPed)
     local closestPed = nil
     local closestDist = maxDist
+    local closestIsPlayer = false
 
     local handle, ped = FindFirstPed()
     local found = true
 
     while found do
-        if DoesEntityExist(ped) and ped ~= playerPed and not IsPedAPlayer(ped) and not IsPedDeadOrDying(ped, true) then
+        if DoesEntityExist(ped) and ped ~= playerPed and not IsPedDeadOrDying(ped, true) then
             local pedPos = GetEntityCoords(ped)
             local dist = #(playerPos - pedPos)
 
@@ -330,6 +409,7 @@ function GetClosestPedInFront(maxDist)
                 if dot > 0.0 then
                     closestDist = dist
                     closestPed = ped
+                    closestIsPlayer = IsPedAPlayer(ped)
                 end
             end
         end
@@ -337,7 +417,7 @@ function GetClosestPedInFront(maxDist)
     end
     EndFindPed(handle)
 
-    return closestPed
+    return closestPed, closestIsPlayer
 end
 
 function RotToDir(rot)
@@ -485,6 +565,32 @@ function TalkToPed()
                         { label = "Assis-toi ici", icon = "wave" },
                         { label = "Déligoter", icon = "wave" },
         }
+    elseif IsPoliceStationPed(hoveredPed) then
+        -- PNJ du commissariat de police
+        local isPolice = IsLocalPlayerPolice()
+        local isOnDuty = IsLocalPlayerOnDuty()
+        local isCommander = IsLocalPlayerCommander()
+
+        name = "Officier d'accueil"
+        if isPolice then
+            dialogue = "Bienvenue au commissariat. Que souhaitez-vous faire ?"
+            responses = {
+                { label = isOnDuty and "Fin de service" or "Prise de service", icon = "key", action = "station_toggle_duty" },
+            }
+            if isCommander then
+                responses[#responses + 1] = { label = "Gérer les grades",    icon = "info", action = "station_grades" }
+                responses[#responses + 1] = { label = "Modifier les salaires", icon = "atm", action = "station_salary" }
+            end
+            responses[#responses + 1] = { label = "Déployer des herses",  icon = "lock",  action = "station_spikes" }
+            responses[#responses + 1] = { label = "Radar de vitesse",     icon = "car",   action = "station_radar" }
+            responses[#responses + 1] = { label = "Au revoir",            icon = "wave",  action = "station_bye" }
+        else
+            dialogue = "Bonjour, bienvenue au commissariat. Vous avez des amendes à régler ?"
+            responses = {
+                { label = "Consulter mes amendes", icon = "atm",  action = "station_check_fines" },
+                { label = "Au revoir",             icon = "wave", action = "station_bye" },
+            }
+        end
     else
         dialogue = Config.DefaultDialogues[math.random(#Config.DefaultDialogues)]
         responses = {
@@ -507,6 +613,59 @@ function TalkToPed()
         headshotUrl = headshotUrl,
         isReceiver  = isReceiver,
         trust       = trust,
+    })
+end
+
+-- ═══════════════════════════════════════════
+--  PARLER À UN JOUEUR (clic gauche sur joueur)
+--  → Actions police si policier en service
+-- ═══════════════════════════════════════════
+
+function TalkToPlayer()
+    if not hoveredPlayer or not DoesEntityExist(hoveredPlayer) then return end
+
+    policeActionTarget = hoveredPlayerServerId
+    isDialogueOpen = true
+    SetNuiFocus(true, true)
+
+    local name = hoveredPlayerName or 'Joueur'
+    local headshotUrl = GetPedHeadshotUrl(hoveredPlayer)
+
+    local isPolice = IsLocalPlayerPolice()
+    local isOnDuty = IsLocalPlayerOnDuty()
+    local isCommander = IsLocalPlayerCommander()
+
+    local dialogue
+    local responses = {}
+
+    if isPolice and isOnDuty then
+        dialogue = name .. " — Actions de police"
+        responses = {
+            { label = "Menotter / Démenotter",   icon = "kidnap",  action = "police_handcuff" },
+            { label = "Fouiller",                icon = "info",    action = "police_frisk" },
+            { label = "Escorter",                icon = "give",    action = "police_escort" },
+            { label = "Mettre dans le véhicule", icon = "car",     action = "police_vehicle" },
+            { label = "Amender",                 icon = "atm",     action = "police_fine_menu" },
+            { label = "Emprisonner",             icon = "lock",    action = "police_jail_menu" },
+        }
+        if isCommander then
+            responses[#responses + 1] = { label = "Recruter dans la Police", icon = "key", action = "police_recruit" }
+        end
+        responses[#responses + 1] = { label = "Annuler", icon = "wave", action = "police_cancel" }
+    else
+        dialogue = "C'est un joueur. Vous n'avez pas d'actions disponibles."
+        responses = {
+            { label = "Ok", icon = "wave", action = "police_cancel" },
+        }
+    end
+
+    SendNUIMessage({
+        action      = 'openDialogue',
+        pedName     = name,
+        dialogue    = dialogue,
+        responses   = responses,
+        headshotUrl = headshotUrl,
+        isPlayer    = true,
     })
 end
 
@@ -582,6 +741,18 @@ RegisterNUICallback('selectResponse', function(data, cb)
 
     local label  = data.label or ''
     local action = data.action or ''
+
+    -- ─── Actions police sur joueur ───────────────────────────
+    if string.find(action, '^police_') then
+        HandlePoliceAction(action)
+        return
+    end
+
+    -- ─── Actions commissariat ─────────────────────────────────
+    if string.find(action, '^station_') then
+        HandleStationAction(action)
+        return
+    end
 
     -- Réponse d'un objet enregistré : déclencher l'event associé
     -- (ignorer les actions dealer_ qui sont gérées plus bas)
@@ -1413,3 +1584,204 @@ AddEventHandler('go_fast:payMoneyResult', function(success, purpose)
         end
     end
 end)
+
+-- ═══════════════════════════════════════════
+--  ACTIONS POLICE (via ALT sur joueur)
+-- ═══════════════════════════════════════════
+
+function HandlePoliceAction(action)
+    local targetId = policeActionTarget
+
+    if action == 'police_cancel' then
+        CloseDialogue(false)
+        return
+    end
+
+    if action == 'police_handcuff' then
+        CloseDialogue(false)
+        if targetId then
+            TriggerServerEvent('police:handcuff', targetId)
+        end
+        return
+    end
+
+    if action == 'police_frisk' then
+        CloseDialogue(false)
+        if targetId then
+            TriggerServerEvent('police:friskPlayer', targetId)
+        end
+        return
+    end
+
+    if action == 'police_escort' then
+        CloseDialogue(false)
+        if targetId then
+            TriggerServerEvent('police:escort', targetId)
+        end
+        return
+    end
+
+    if action == 'police_vehicle' then
+        CloseDialogue(false)
+        if targetId then
+            TriggerServerEvent('police:putInVehicle', targetId)
+        end
+        return
+    end
+
+    if action == 'police_recruit' then
+        CloseDialogue(false)
+        if targetId then
+            TriggerServerEvent('police:recruit', targetId)
+        end
+        return
+    end
+
+    -- ─── Sous-menu amende : choix du montant ──────────────────
+    if action == 'police_fine_menu' then
+        SendNUIMessage({
+            action    = 'openDialogue',
+            pedName   = hoveredPlayerName or 'Joueur',
+            dialogue  = "Choisissez le montant de l'amende :",
+            responses = {
+                { label = "$500",    icon = "atm", action = "police_fine_500" },
+                { label = "$1 000",  icon = "atm", action = "police_fine_1000" },
+                { label = "$2 500",  icon = "atm", action = "police_fine_2500" },
+                { label = "$5 000",  icon = "atm", action = "police_fine_5000" },
+                { label = "$10 000", icon = "atm", action = "police_fine_10000" },
+                { label = "$25 000", icon = "atm", action = "police_fine_25000" },
+                { label = "$50 000", icon = "atm", action = "police_fine_50000" },
+                { label = "Annuler", icon = "wave", action = "police_cancel" },
+            },
+            isPlayer = true,
+        })
+        return
+    end
+
+    -- Amendes avec montants prédéfinis
+    if string.find(action, '^police_fine_') then
+        local amountStr = string.gsub(action, 'police_fine_', '')
+        local amount = tonumber(amountStr) or 0
+        if amount > 0 and targetId then
+            -- Sous-menu raison de l'amende
+            SendNUIMessage({
+                action    = 'openDialogue',
+                pedName   = hoveredPlayerName or 'Joueur',
+                dialogue  = "Amende de $" .. amount .. " — Motif :",
+                responses = {
+                    { label = "Excès de vitesse",         icon = "car",  action = "police_fine_reason_vitesse_" .. amount },
+                    { label = "Stationnement interdit",   icon = "car",  action = "police_fine_reason_stationnement_" .. amount },
+                    { label = "Conduite dangereuse",      icon = "car",  action = "police_fine_reason_conduite_" .. amount },
+                    { label = "Trouble à l'ordre public", icon = "info", action = "police_fine_reason_trouble_" .. amount },
+                    { label = "Port d'arme illégal",      icon = "lock", action = "police_fine_reason_arme_" .. amount },
+                    { label = "Autre infraction",         icon = "info", action = "police_fine_reason_autre_" .. amount },
+                    { label = "Annuler",                  icon = "wave", action = "police_cancel" },
+                },
+                isPlayer = true,
+            })
+        end
+        return
+    end
+
+    -- Amende avec raison
+    if string.find(action, '^police_fine_reason_') then
+        local parts = string.gsub(action, 'police_fine_reason_', '')
+        local reason, amount
+        local reasonMap = {
+            vitesse        = "Excès de vitesse",
+            stationnement  = "Stationnement interdit",
+            conduite       = "Conduite dangereuse",
+            trouble        = "Trouble à l'ordre public",
+            arme           = "Port d'arme illégal",
+            autre          = "Autre infraction",
+        }
+        for key, label in pairs(reasonMap) do
+            if string.find(parts, '^' .. key .. '_') then
+                reason = label
+                amount = tonumber(string.gsub(parts, '^' .. key .. '_', ''))
+                break
+            end
+        end
+        if reason and amount and amount > 0 and targetId then
+            CloseDialogue(false)
+            TriggerServerEvent('police:createFine', targetId, amount, reason)
+        end
+        return
+    end
+
+    -- ─── Sous-menu prison : choix de la durée ─────────────────
+    if action == 'police_jail_menu' then
+        SendNUIMessage({
+            action    = 'openDialogue',
+            pedName   = hoveredPlayerName or 'Joueur',
+            dialogue  = "Choisissez la durée d'emprisonnement :",
+            responses = {
+                { label = "5 minutes",  icon = "lock", action = "police_jail_5" },
+                { label = "10 minutes", icon = "lock", action = "police_jail_10" },
+                { label = "15 minutes", icon = "lock", action = "police_jail_15" },
+                { label = "30 minutes", icon = "lock", action = "police_jail_30" },
+                { label = "60 minutes", icon = "lock", action = "police_jail_60" },
+                { label = "Annuler",    icon = "wave", action = "police_cancel" },
+            },
+            isPlayer = true,
+        })
+        return
+    end
+
+    -- Prison avec durée prédéfinie
+    if string.find(action, '^police_jail_') then
+        local minutes = tonumber(string.gsub(action, 'police_jail_', ''))
+        if minutes and minutes > 0 and targetId then
+            CloseDialogue(false)
+            TriggerServerEvent('police:jailPlayer', targetId, minutes)
+        end
+        return
+    end
+end
+
+-- ═══════════════════════════════════════════
+--  ACTIONS COMMISSARIAT (via ALT sur PNJ station)
+-- ═══════════════════════════════════════════
+
+function HandleStationAction(action)
+    if action == 'station_bye' then
+        CloseDialogue(false)
+        return
+    end
+
+    if action == 'station_toggle_duty' then
+        CloseDialogue(false)
+        TriggerServerEvent('police:toggleDuty')
+        return
+    end
+
+    if action == 'station_check_fines' then
+        CloseDialogue(false)
+        TriggerServerEvent('police:getMyFines')
+        return
+    end
+
+    if action == 'station_spikes' then
+        CloseDialogue(false)
+        TriggerEvent('police:deploySpikeStrip')
+        return
+    end
+
+    if action == 'station_radar' then
+        CloseDialogue(false)
+        TriggerEvent('police:toggleRadar')
+        return
+    end
+
+    if action == 'station_grades' then
+        CloseDialogue(false)
+        TriggerServerEvent('police:requestGrades')
+        return
+    end
+
+    if action == 'station_salary' then
+        CloseDialogue(false)
+        TriggerServerEvent('police:requestGrades')
+        return
+    end
+end

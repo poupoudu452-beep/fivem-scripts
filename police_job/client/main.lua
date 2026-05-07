@@ -6,6 +6,14 @@ PlayerPoliceData = nil -- { identifier, grade_name, grade_level, on_duty, salary
 IsOnDuty = false
 IsPolice = false
 
+-- ─── Exports client pour pnj_interact / bank_system ───────
+exports('IsPoliceClient', function() return IsPolice end)
+exports('IsOnDutyClient', function() return IsOnDuty end)
+exports('GetPoliceDataClient', function() return PlayerPoliceData end)
+exports('IsCommanderClient', function()
+    return PlayerPoliceData and PlayerPoliceData.grade_name == PoliceConfig.CommanderGrade
+end)
+
 -- ─── Reception des donnees police ───────────────────────────
 RegisterNetEvent('police:loadData')
 AddEventHandler('police:loadData', function(data)
@@ -72,67 +80,12 @@ CreateThread(function()
     EndTextCommandSetBlipName(blip)
 end)
 
--- ─── Interaction PNJ commissariat (E) ───────────────────────
+-- ─── Marquer le PNJ du commissariat pour pnj_interact ──────
 CreateThread(function()
-    while true do
-        Citizen.Wait(0)
-        if stationPed then
-            local playerPed = PlayerPedId()
-            local playerCoords = GetEntityCoords(playerPed)
-            local npcCoords = GetEntityCoords(stationPed)
-            local dist = #(playerCoords - npcCoords)
-
-            if dist <= 2.5 then
-                -- Afficher prompt
-                SetTextFont(4)
-                SetTextScale(0.0, 0.35)
-                SetTextColour(255, 255, 255, 240)
-                SetTextDropshadow(1, 0, 0, 0, 200)
-                SetTextOutline()
-                SetTextCentre(true)
-                SetTextEntry('STRING')
-
-                if IsPolice then
-                    AddTextComponentString('[E] Menu Police')
-                else
-                    AddTextComponentString('[E] Parler')
-                end
-                DrawText(0.5, 0.88)
-
-                if IsControlJustReleased(0, 38) then -- E key
-                    if IsPolice then
-                        OpenPoliceMenu()
-                    else
-                        -- Joueur civil, verifier ses amendes
-                        TriggerServerEvent('police:getMyFines')
-                    end
-                end
-            else
-                Citizen.Wait(500)
-            end
-        else
-            Citizen.Wait(1000)
-        end
-    end
-end)
-
--- ─── Touche F7 pour ouvrir le menu police ───────────────────
-CreateThread(function()
-    while true do
-        Citizen.Wait(0)
-        if IsPolice and IsControlJustReleased(0, 168) then -- F7
-            OpenPoliceMenu()
-        end
-    end
-end)
-
--- ─── Touche F6 pour toggle duty ─────────────────────────────
-CreateThread(function()
-    while true do
-        Citizen.Wait(0)
-        if IsPolice and IsControlJustReleased(0, 167) then -- F6
-            TriggerServerEvent('police:toggleDuty')
-        end
+    Citizen.Wait(2000)
+    if stationPed and DoesEntityExist(stationPed) then
+        DecorRegister('police_station_npc', 3)
+        DecorSetInt(stationPed, 'police_station_npc', 1)
     end
 end)
 

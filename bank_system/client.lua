@@ -75,6 +75,7 @@ function OpenBank()
     isOpen = true
     SetNuiFocus(true, true)
     TriggerServerEvent('bank:requestData')
+    TriggerServerEvent('bank:requestCompanyData')
 end
 
 -- ─── Fermer la banque ─────────────────────────────────────────────────────
@@ -94,6 +95,15 @@ AddEventHandler('bank:receiveData', function(data)
     SendNUIMessage({
         action = 'open',
         data   = data,
+    })
+end)
+
+-- ─── Réception des données entreprise ───────────────────────────────────────
+RegisterNetEvent('bank:receiveCompanyData')
+AddEventHandler('bank:receiveCompanyData', function(data)
+    SendNUIMessage({
+        action      = 'companyData',
+        companyData = data,
     })
 end)
 
@@ -208,6 +218,22 @@ RegisterNUICallback('withdraw', function(data, cb)
     local amount = tonumber(data.amount) or 0
     if amount > 0 then
         TriggerServerEvent('bank:withdraw', amount)
+    end
+    cb('ok')
+end)
+
+RegisterNUICallback('companyDeposit', function(data, cb)
+    local amount = tonumber(data.amount) or 0
+    if amount > 0 then
+        TriggerServerEvent('bank:companyDeposit', amount)
+    end
+    cb('ok')
+end)
+
+RegisterNUICallback('companyWithdraw', function(data, cb)
+    local amount = tonumber(data.amount) or 0
+    if amount > 0 then
+        TriggerServerEvent('bank:companyWithdraw', amount)
     end
     cb('ok')
 end)

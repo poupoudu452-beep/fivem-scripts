@@ -45,6 +45,10 @@
                     <span class="nav-icon">👤</span>
                     <span>Mon Compte</span>
                 </button>
+                <button class="nav-btn nav-btn-company hidden" id="nav-company" data-page="company" onclick="switchPage('company')">
+                    <span class="nav-icon">🏢</span>
+                    <span>Entreprise</span>
+                </button>
             </nav>
 
             <div class="sidebar-footer">
@@ -185,6 +189,72 @@
                 <h1 class="page-title">Historique des transactions</h1>
                 <div class="card">
                     <div id="transactions-list" class="transaction-list full-list">
+                        <div class="empty-state">Aucune transaction</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company Page (Entreprise) -->
+            <div class="page" id="page-company">
+                <h1 class="page-title">Compte Entreprise</h1>
+
+                <div class="company-header-bar">
+                    <div class="company-badge">
+                        <span class="company-icon">🏢</span>
+                        <div>
+                            <div class="company-name" id="company-name">Entreprise</div>
+                            <div class="company-role">Commandant / Gerant</div>
+                        </div>
+                    </div>
+                    <div class="company-balance-box">
+                        <span class="company-balance-label">Solde entreprise</span>
+                        <span class="company-balance-value" id="company-balance">$0</span>
+                    </div>
+                </div>
+
+                <div class="company-actions-grid">
+                    <div class="card operation-card">
+                        <h3 class="company-section-title">Deposer sur le compte entreprise</h3>
+                        <div class="amount-section">
+                            <div class="amount-input-wrap">
+                                <span class="currency-symbol">$</span>
+                                <input type="number" id="company-deposit-amount" class="amount-input" placeholder="0" min="1">
+                            </div>
+                            <div class="quick-amounts">
+                                <button class="quick-btn" onclick="setAmount('company-deposit', 1000)">$1,000</button>
+                                <button class="quick-btn" onclick="setAmount('company-deposit', 5000)">$5,000</button>
+                                <button class="quick-btn" onclick="setAmount('company-deposit', 10000)">$10,000</button>
+                                <button class="quick-btn" onclick="setAmount('company-deposit', 50000)">$50,000</button>
+                            </div>
+                        </div>
+                        <button class="action-btn deposit-btn" onclick="doCompanyDeposit()">Deposer</button>
+                        <div id="company-deposit-msg" class="operation-msg"></div>
+                    </div>
+
+                    <div class="card operation-card">
+                        <h3 class="company-section-title">Retirer du compte entreprise</h3>
+                        <div class="amount-section">
+                            <div class="amount-input-wrap">
+                                <span class="currency-symbol">$</span>
+                                <input type="number" id="company-withdraw-amount" class="amount-input" placeholder="0" min="1">
+                            </div>
+                            <div class="quick-amounts">
+                                <button class="quick-btn" onclick="setAmount('company-withdraw', 1000)">$1,000</button>
+                                <button class="quick-btn" onclick="setAmount('company-withdraw', 5000)">$5,000</button>
+                                <button class="quick-btn" onclick="setAmount('company-withdraw', 10000)">$10,000</button>
+                                <button class="quick-btn" onclick="setAmount('company-withdraw', 50000)">$50,000</button>
+                            </div>
+                        </div>
+                        <button class="action-btn withdraw-btn" onclick="doCompanyWithdraw()">Retirer</button>
+                        <div id="company-withdraw-msg" class="operation-msg"></div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 12px;">
+                    <div class="activity-header">
+                        <h3>Transactions entreprise</h3>
+                    </div>
+                    <div id="company-transactions-list" class="transaction-list full-list">
                         <div class="empty-state">Aucune transaction</div>
                     </div>
                 </div>
