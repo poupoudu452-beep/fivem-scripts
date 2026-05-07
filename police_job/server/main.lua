@@ -710,6 +710,156 @@ AddEventHandler('police:radioMessage', function(message)
     end
 end)
 
+-- ─── Commande Admin : /setjob1 [id] [job] [grade] ─────────
+-- Modifie le job1 (entreprise legale) d'un joueur dans la BDD
+RegisterCommand('setjob1', function(source, args)
+    local src = source
+    if src > 0 then
+        -- Verifier si le joueur est admin ou commandant
+        if not IsPlayerAceAllowed(src, 'command.setjob1') and not IsCommander(src) then
+            TriggerClientEvent('police:notify', src, 'Vous n\'avez pas la permission.', 'error')
+            return
+        end
+    end
+
+    local targetId = tonumber(args[1])
+    local jobName = args[2]
+    local gradeName = args[3]
+
+    if not targetId or not jobName then
+        if src > 0 then
+            TriggerClientEvent('police:notify', src, 'Usage: /setjob1 [id] [job] [grade]', 'error')
+        else
+            print('[PoliceJob] Usage: /setjob1 [id] [job] [grade]')
+        end
+        return
+    end
+
+    local targetPed = GetPlayerPed(targetId)
+    if not targetPed or targetPed == 0 then
+        if src > 0 then
+            TriggerClientEvent('police:notify', src, 'Joueur ID ' .. targetId .. ' introuvable.', 'error')
+        else
+            print('[PoliceJob] Joueur ID ' .. targetId .. ' introuvable.')
+        end
+        return
+    end
+
+    local targetIdentifier = getIdentifier(targetId)
+    if not targetIdentifier then return end
+
+    -- Mettre a jour job1 dans la table characters
+    MySQL.query('UPDATE characters SET job1 = ? WHERE identifier = ?',
+        { jobName, targetIdentifier }, function(result)
+        if result and result.affectedRows and result.affectedRows > 0 then
+            local msg = 'Job1 de ' .. (GetPlayerName(targetId) or ('ID ' .. targetId)) .. ' => ' .. jobName
+            if gradeName then
+                msg = msg .. ' (grade: ' .. gradeName .. ')'
+            end
+
+            -- Si le job est Police, gerer l'insertion dans police_officers
+            if jobName == PoliceConfig.JobName then
+                local gradeToSet = gradeName or 'Recrue'
+                MySQL.query('SELECT id FROM police_grades WHERE name = ?', { gradeToSet }, function(gradeRows)
+                    if gradeRows and gradeRows[1] then
+                        MySQL.query(
+                            'INSERT INTO police_officers (identifier, grade_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE grade_id = ?',
+                            { targetIdentifier, gradeRows[1].id, gradeRows[1].id },
+                            function()
+                                LoadPoliceData(targetId)
+                                RefreshOnlineOfficers()
+                            end
+                        )
+                    end
+                end)
+            else
+                -- Si on retire du job Police, supprimer de police_officers
+                MySQL.query('DELETE FROM police_officers WHERE identifier = ?', { targetIdentifier }, function()
+                    if PoliceOfficers[targetId] then
+                        PoliceOfficers[targetId] = nil
+                        TriggerClientEvent('police:fired', targetId)
+                        RefreshOnlineOfficers()
+                    end
+                end)
+            end
+
+            if src > 0 then
+                TriggerClientEvent('police:notify', src, msg, 'success')
+            else
+                print('[PoliceJob] ' .. msg)
+            end
+            TriggerClientEvent('police:notify', targetId,
+                'Votre job a ete modifie : ' .. jobName .. (gradeName and (' - ' .. gradeName) or ''), 'warning')
+        else
+            if src > 0 then
+                TriggerClientEvent('police:notify', src, 'Echec : joueur introuvable en BDD.', 'error')
+            else
+                print('[PoliceJob] Echec : joueur introuvable en BDD.')
+            end
+        end
+    end)
+end, true) -- true = restricted (ace permission)
+
+-- ─── Commande Admin : /setjob2 [id] [job] ─────────────────
+-- Modifie le job2 (groupe illegal) d'un joueur dans la BDD
+RegisterCommand('setjob2', function(source, args)
+    local src = source
+    if src > 0 then
+        if not IsPlayerAceAllowed(src, 'command.setjob2') and not IsCommander(src) then
+            TriggerClientEvent('police:notify', src, 'Vous n\'avez pas la permission.', 'error')
+            return
+        end
+    end
+
+    local targetId = tonumber(args[1])
+    local jobName = args[2]
+
+    if not targetId or not jobName then
+        if src > 0 then
+            TriggerClientEvent('police:notify', src, 'Usage: /setjob2 [id] [job]', 'error')
+        else
+            print('[PoliceJob] Usage: /setjob2 [id] [job]')
+        end
+        return
+    end
+
+    local targetPed = GetPlayerPed(targetId)
+    if not targetPed or targetPed == 0 then
+        if src > 0 then
+            TriggerClientEvent('police:notify', src, 'Joueur ID ' .. targetId .. ' introuvable.', 'error')
+        else
+            print('[PoliceJob] Joueur ID ' .. targetId .. ' introuvable.')
+        end
+        return
+    end
+
+    local targetIdentifier = getIdentifier(targetId)
+    if not targetIdentifier then return end
+
+    -- Mettre a jour job2 dans la table characters
+    MySQL.query('UPDATE characters SET job2 = ? WHERE identifier = ?',
+        { jobName, targetIdentifier }, function(result)
+        if result and result.affectedRows and result.affectedRows > 0 then
+            local targetName = GetPlayerName(targetId) or ('ID ' .. targetId)
+            local msg = 'Job2 de ' .. targetName .. ' => ' .. jobName
+
+            if src > 0 then
+                TriggerClientEvent('police:notify', src, msg, 'success')
+            else
+                print('[PoliceJob] ' .. msg)
+            end
+            TriggerClientEvent('police:notify', targetId,
+                'Votre groupe a ete modifie : ' .. jobName, 'warning')
+        else
+            if src > 0 then
+                TriggerClientEvent('police:notify', src, 'Echec : joueur introuvable en BDD.', 'error')
+            else
+                print('[PoliceJob] Echec : joueur introuvable en BDD.')
+            end
+        end
+    end)
+end, true) -- true = restricted (ace permission)
+
 -- ─── Exports ────────────────────────────────────────────────
 exports('IsPoliceOfficer', IsPoliceOfficer)
 exports('IsCommander', IsCommander)
