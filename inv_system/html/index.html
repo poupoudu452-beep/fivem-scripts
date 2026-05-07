@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventaire</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="inv-overlay" class="hidden">
+
+        <div id="inv-layout">
+
+            <!-- PANNEAU GAUCHE : INVENTAIRE -->
+            <div id="inv-panel" class="panel">
+                <div class="panel-header">
+                    <div class="panel-header-left">
+                        <div class="panel-logo">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="panel-brand">Dynasty</h1>
+                            <p class="panel-brand-sub">INVENTAIRE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-sub-header">
+                    <div class="sub-header-left">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+                            <path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/>
+                            <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+                        </svg>
+                        <span class="sub-header-label">Inventaire</span>
+                    </div>
+                    <div class="weight-section">
+                        <span class="weight-text" id="weight-text">0/30Kg</span>
+                        <div class="weight-dot-track">
+                            <div class="weight-dot" id="weight-dot"></div>
+                        </div>
+                        <svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0110 0v4"/>
+                        </svg>
+                    </div>
+                </div>
+
+
+                <div class="panel-body">
+                    <div class="slots-grid" id="slots-grid"></div>
+                </div>
+
+                <div class="hotbar" id="hotbar">
+                    <div class="hotbar-slot" data-slot="1"><span class="hotbar-key">Slot 1</span></div>
+                    <div class="hotbar-slot" data-slot="2"><span class="hotbar-key">Slot 2</span></div>
+                    <div class="hotbar-slot" data-slot="3"><span class="hotbar-key">Slot 3</span></div>
+                    <div class="hotbar-slot" data-slot="4"><span class="hotbar-key">Slot 4</span></div>
+                    <div class="hotbar-slot" data-slot="5"><span class="hotbar-key">Slot 5</span></div>
+                </div>
+            </div>
+
+            <!-- PANNEAU CENTRAL : ACTIONS -->
+            <div id="center-panel">
+                <div class="actions-bar">
+                    <div class="actions-label">Actions:</div>
+                    <div class="actions-buttons">
+                        <button class="action-btn action-use" id="action-use" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            <span>Utiliser</span>
+                        </button>
+                        <button class="action-btn action-give" id="action-give" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 010 7.75"/>
+                            </svg>
+                            <span>Donner</span>
+                        </button>
+                        <button class="action-btn action-drop" id="action-drop" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                            </svg>
+                            <span>Jeter</span>
+                        </button>
+                    </div>
+                    <div class="actions-qty">
+                        <input type="number" id="action-qty" min="1" value="1" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANNEAU DROIT : INFO + PROXIMITE -->
+            <div id="right-column">
+                <div class="info-box" id="info-box-top">
+                    <h3 class="info-title">Information</h3>
+                    <p class="info-text" id="info-text">Cette section vous permet de visualiser le contenu du coffre ou des objets a proximite et y deposer les items que vous souhaitez grace au glisser-deposer. N.B: Vous pouvez choisir le nombre d&#39;items a deposer avec la case en haut centre de votre ecran</p>
+                </div>
+
+                <div id="proximity-panel" class="panel">
+                    <div class="panel-sub-header" id="prox-header">
+                        <div class="sub-header-left">
+                            <svg id="prox-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+                                <ellipse cx="12" cy="18" rx="8" ry="2"/>
+                                <path d="M12 6v12"/>
+                                <path d="M8 10l4-4 4 4"/>
+                            </svg>
+                            <svg id="prox-icon-trunk" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+                                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                                <path d="M16 7V5a4 4 0 00-8 0v2"/>
+                                <line x1="12" y1="11" x2="12" y2="15"/>
+                                <line x1="10" y1="13" x2="14" y2="13"/>
+                            </svg>
+                            <svg id="prox-icon-glovebox" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
+                                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                <path d="M2 10h20"/>
+                                <path d="M10 10v4h4v-4"/>
+                            </svg>
+                            <span class="sub-header-label" id="prox-label">a proximite</span>
+                        </div>
+                        <div class="weight-section">
+                            <span class="weight-text" id="prox-weight-text">0/Kg</span>
+                            <div class="weight-dot-track">
+                                <div class="weight-dot" id="prox-weight-dot"></div>
+                            </div>
+                            <svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0110 0v4"/>
+                            </svg>
+                        </div>
+                    </div>
+
+
+                    <div class="panel-body proximity-body">
+                        <div class="ground-drop-zone" id="ground-drop-zone">
+                            <div class="ground-drop-hint" id="ground-drop-hint">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24">
+                                    <path d="M12 4v12m0 0l-4-4m4 4l4-4"/>
+                                    <path d="M4 20h16"/>
+                                </svg>
+                                <span>Glisser un objet ici</span>
+                            </div>
+                            <div class="ground-slots" id="ground-slots"></div>
+                        </div>
+                        <div class="vehicle-storage-zone hidden" id="vehicle-storage-zone">
+                            <div class="vehicle-slots-grid" id="vehicle-slots"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="info-box info-box-bottom" id="info-box-bottom">
+            <h3 class="info-title">Information</h3>
+            <p class="info-text">La barre des items rapides vous permet d&#39;utiliser vos objets a tout moment sans ouvrir l&#39;inventaire grace aux touches 1,2,3,4,5 (configurables)</p>
+        </div>
+
+        <div class="tooltip hidden" id="tooltip">
+            <div class="tooltip-icon" id="tt-icon"></div>
+            <div class="tooltip-info">
+                <div class="tooltip-name" id="tt-name"></div>
+                <div class="tooltip-desc" id="tt-desc"></div>
+                <div class="tooltip-weight" id="tt-weight"></div>
+            </div>
+            <div class="tooltip-actions">
+                <button class="tt-btn use-btn" id="tt-use">Utiliser</button>
+                <button class="tt-btn pickup-btn" id="tt-pickup" style="display:none">Ramasser</button>
+                <button class="tt-btn drop-btn" id="tt-drop">Jeter</button>
+                <button class="tt-btn drop-all-btn" id="tt-drop-all">Tout jeter</button>
+                <button class="tt-btn give-btn" id="tt-give">Donner</button>
+            </div>
+        </div>
+
+        <div class="qty-modal hidden" id="qty-modal">
+            <div class="qty-modal-content">
+                <div class="qty-modal-title" id="qty-modal-title">Quantite</div>
+                <div class="qty-modal-body">
+                    <div class="qty-input-row hidden" id="qty-target-row">
+                        <label>ID Joueur</label>
+                        <input type="number" id="qty-target-input" min="1" placeholder="ID" />
+                    </div>
+                    <div class="qty-input-row">
+                        <label>Quantite</label>
+                        <input type="number" id="qty-input" min="1" value="1" />
+                        <button class="qty-all-btn" id="qty-all-btn">TOUT</button>
+                    </div>
+                </div>
+                <div class="qty-modal-actions">
+                    <button class="qty-confirm-btn" id="qty-confirm-btn">Confirmer</button>
+                    <button class="qty-cancel-btn" id="qty-cancel-btn">Annuler</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="used-item-notif" class="used-item-notif hidden">
+        <div class="used-item-icon" id="used-item-icon"></div>
+        <div class="used-item-info">
+            <div class="used-item-label" id="used-item-label"></div>
+            <div class="used-item-text">Objet utilise</div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

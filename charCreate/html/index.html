@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cr&eacute;ation de personnage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div id="root" class="hidden">
+
+  <!-- Particules de fond -->
+  <div id="particles"></div>
+  <div class="bg-lines">
+    <div class="bg-line"></div>
+    <div class="bg-line"></div>
+    <div class="bg-line"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       ECRAN D'ACCUEIL
+  ══════════════════════════════════════ -->
+  <div id="screen-welcome" class="screen active">
+    <div class="welcome-inner">
+      <div class="welcome-ornament">
+        <span class="orn-line"></span>
+        <span class="orn-diamond">&loz;</span>
+        <span class="orn-line"></span>
+      </div>
+      <h1 class="welcome-title">Bienvenue</h1>
+      <p class="welcome-sub">Avant de rejoindre le monde, vous devez<br/>donner une identit&eacute; &agrave; votre personnage.</p>
+      <button class="btn-start" onclick="goStep(1)">
+        <span>Commencer</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       FORMULAIRE MULTI-ETAPES
+  ══════════════════════════════════════ -->
+  <div id="screen-form" class="screen">
+
+    <div id="progress-bar">
+      <div id="progress-fill"></div>
+      <div id="progress-steps">
+        <div class="pstep active" data-step="1"><span>01</span><small>Genre</small></div>
+        <div class="pstep"        data-step="2"><span>02</span><small>Identit&eacute;</small></div>
+        <div class="pstep"        data-step="3"><span>03</span><small>Physique</small></div>
+        <div class="pstep"        data-step="4"><span>04</span><small>Confirmation</small></div>
+      </div>
+    </div>
+
+    <div id="steps-wrapper">
+
+      <!-- ETAPE 1 : Genre -->
+      <div class="step" id="step-1">
+        <div class="step-header">
+          <p class="step-num">&Eacute;tape 01</p>
+          <h2 class="step-title">Choisissez votre genre</h2>
+        </div>
+        <div class="gender-cards">
+          <div class="gender-card" id="card-male" onclick="selectGender('male')">
+            <div class="gender-silhouette male-sil">
+              <svg viewBox="0 0 80 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="40" cy="22" rx="14" ry="16" fill="currentColor" opacity="0.9"/>
+                <rect x="35" y="36" width="10" height="8" rx="3" fill="currentColor" opacity="0.8"/>
+                <path d="M20 44 Q18 60 18 82 L62 82 Q62 60 60 44 Q50 40 40 40 Q30 40 20 44Z" fill="currentColor" opacity="0.85"/>
+                <path d="M20 48 Q10 58 8 80 Q8 88 14 88 Q18 88 20 80 L24 58Z" fill="currentColor" opacity="0.8"/>
+                <path d="M60 48 Q70 58 72 80 Q72 88 66 88 Q62 88 60 80 L56 58Z" fill="currentColor" opacity="0.8"/>
+                <path d="M18 82 Q16 110 15 138 Q14 148 22 148 Q28 148 30 140 L36 100 L44 100 L50 140 Q52 148 58 148 Q66 148 65 138 L64 82Z" fill="currentColor" opacity="0.8"/>
+              </svg>
+            </div>
+            <div class="gender-info">
+              <div class="gender-name">Masculin</div>
+              <div class="gender-desc">Homme</div>
+            </div>
+            <div class="gender-check">&check;</div>
+          </div>
+
+          <div class="gender-card" id="card-female" onclick="selectGender('female')">
+            <div class="gender-silhouette female-sil">
+              <svg viewBox="0 0 80 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="40" cy="20" rx="13" ry="15" fill="currentColor" opacity="0.9"/>
+                <path d="M27 18 Q25 5 40 4 Q55 5 53 18 Q60 10 58 24 Q55 35 53 38 L40 35 L27 38 Q25 35 22 24 Q20 10 27 18Z" fill="currentColor" opacity="0.7"/>
+                <rect x="35.5" y="33" width="9" height="7" rx="3" fill="currentColor" opacity="0.8"/>
+                <path d="M24 40 Q22 52 22 65 Q22 78 24 82 L56 82 Q58 78 58 65 Q58 52 56 40 Q50 37 40 37 Q30 37 24 40Z" fill="currentColor" opacity="0.85"/>
+                <path d="M24 44 Q14 55 12 76 Q12 84 18 84 Q22 84 24 76 L27 55Z" fill="currentColor" opacity="0.8"/>
+                <path d="M56 44 Q66 55 68 76 Q68 84 62 84 Q58 84 56 76 L53 55Z" fill="currentColor" opacity="0.8"/>
+                <path d="M24 82 Q20 100 19 120 L28 120 L34 100 L40 105 L46 100 L52 120 L61 120 Q60 100 56 82Z" fill="currentColor" opacity="0.75"/>
+                <path d="M19 120 Q17 138 16 150 Q16 156 22 156 Q28 156 29 150 L30 128 L28 120Z" fill="currentColor" opacity="0.8"/>
+                <path d="M61 120 Q63 138 64 150 Q64 156 58 156 Q52 156 51 150 L50 128 L52 120Z" fill="currentColor" opacity="0.8"/>
+              </svg>
+            </div>
+            <div class="gender-info">
+              <div class="gender-name">F&eacute;minin</div>
+              <div class="gender-desc">Femme</div>
+            </div>
+            <div class="gender-check">&check;</div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <span></span>
+          <button class="btn-next" onclick="nextStep(1)" id="btn-next-1" disabled>
+            Suivant <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ETAPE 2 : Identite -->
+      <div class="step" id="step-2">
+        <div class="step-header">
+          <p class="step-num">&Eacute;tape 02</p>
+          <h2 class="step-title">Votre identit&eacute;</h2>
+        </div>
+        <div class="fields">
+          <div class="field-group">
+            <label for="inp-firstname">Pr&eacute;nom <span class="req">*</span></label>
+            <input type="text" id="inp-firstname" placeholder="Ex : Jean" maxlength="50" oninput="validateIdentity()"/>
+            <div class="field-hint">2 &agrave; 50 caract&egrave;res</div>
+          </div>
+          <div class="field-group">
+            <label for="inp-lastname">Nom de famille <span class="req">*</span></label>
+            <input type="text" id="inp-lastname" placeholder="Ex : Dupont" maxlength="50" oninput="validateIdentity()"/>
+            <div class="field-hint">2 &agrave; 50 caract&egrave;res</div>
+          </div>
+          <div class="field-group half">
+            <label for="inp-age">&Acirc;ge <span class="req">*</span></label>
+            <div class="input-with-val">
+              <input type="range" id="inp-age" min="18" max="80" value="28" oninput="updateRange('age')"/>
+              <span class="range-val" id="val-age">28 ans</span>
+            </div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-prev" onclick="prevStep(2)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Retour
+          </button>
+          <button class="btn-next" onclick="nextStep(2)" id="btn-next-2" disabled>
+            Suivant <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ETAPE 3 : Physique -->
+      <div class="step" id="step-3">
+        <div class="step-header">
+          <p class="step-num">&Eacute;tape 03</p>
+          <h2 class="step-title">Caract&eacute;ristiques physiques</h2>
+        </div>
+        <div class="fields">
+          <div class="field-group">
+            <label for="inp-height">Taille</label>
+            <div class="input-with-val">
+              <input type="range" id="inp-height" min="150" max="220" value="175" oninput="updateRange('height')"/>
+              <span class="range-val" id="val-height">175 cm</span>
+            </div>
+            <div class="height-visual">
+              <div class="hv-bar" id="hv-bar"></div>
+              <div class="hv-labels"><span>220 cm</span><span>185 cm</span><span>150 cm</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-prev" onclick="prevStep(3)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Retour
+          </button>
+          <button class="btn-next" onclick="nextStep(3)">
+            Suivant <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ETAPE 4 : Confirmation -->
+      <div class="step" id="step-4">
+        <div class="step-header">
+          <p class="step-num">&Eacute;tape 04</p>
+          <h2 class="step-title">R&eacute;capitulatif</h2>
+        </div>
+        <div class="recap-card">
+          <div class="recap-ornament">
+            <span class="orn-line"></span><span class="orn-diamond">&loz;</span><span class="orn-line"></span>
+          </div>
+          <div class="recap-name" id="recap-name">&mdash;</div>
+          <div class="recap-grid">
+            <div class="recap-item">
+              <div class="ri-label">Genre</div>
+              <div class="ri-value" id="recap-gender">&mdash;</div>
+            </div>
+            <div class="recap-item">
+              <div class="ri-label">&Acirc;ge</div>
+              <div class="ri-value" id="recap-age">&mdash;</div>
+            </div>
+            <div class="recap-item">
+              <div class="ri-label">Taille</div>
+              <div class="ri-value" id="recap-height">&mdash;</div>
+            </div>
+          </div>
+          <p class="recap-warning">
+            Ces informations sont <strong>d&eacute;finitives</strong>.<br/>Assurez-vous qu'elles sont correctes avant de confirmer.
+          </p>
+        </div>
+        <div class="step-nav">
+          <button class="btn-prev" onclick="prevStep(4)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Retour
+          </button>
+          <button class="btn-confirm" onclick="confirmCreation()" id="btn-confirm">
+            <span id="confirm-label">Cr&eacute;er mon personnage</span>
+            <div id="confirm-loader" class="loader hidden"></div>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /steps-wrapper -->
+  </div><!-- /screen-form -->
+
+  <!-- ══════════════════════════════════════
+       EDITEUR D'APPARENCE
+  ══════════════════════════════════════ -->
+  <div id="screen-appearance" class="screen">
+    <div class="appearance-panel">
+      <div class="app-header">
+        <div class="welcome-ornament" style="margin-bottom:12px">
+          <span class="orn-line"></span>
+          <span class="orn-diamond">&loz;</span>
+          <span class="orn-line"></span>
+        </div>
+        <h2 class="app-title">Personnalisation</h2>
+      </div>
+      <div class="app-tabs" id="app-tabs"></div>
+      <div class="app-body" id="app-body"></div>
+      <div class="app-footer">
+        <div class="app-rotate">
+          <button class="rotate-btn" onclick="rotatePed(-30)" title="Tourner gauche">&#9664;</button>
+          <button class="rotate-btn" onclick="rotatePed(30)" title="Tourner droite">&#9654;</button>
+        </div>
+        <button class="btn-confirm app-save-btn" onclick="saveAppearance()" id="btn-save-appearance">
+          <span>Valider l'apparence</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SELECTION DU PERSONNAGE (reconnexion)
+  ══════════════════════════════════════ -->
+  <div id="screen-select" class="screen">
+    <div class="select-card">
+      <div class="welcome-ornament">
+        <span class="orn-line"></span>
+        <span class="orn-diamond">&loz;</span>
+        <span class="orn-line"></span>
+      </div>
+      <h2 class="select-name" id="select-name">&mdash;</h2>
+      <div class="select-info">
+        <span class="select-tag" id="select-gender">&mdash;</span>
+        <span class="select-sep">&middot;</span>
+        <span class="select-tag" id="select-age">&mdash;</span>
+      </div>
+      <button class="btn-start select-play-btn" onclick="playCharacter()">
+        <span>Jouer</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Notification d'erreur -->
+  <div id="error-toast" class="hidden"></div>
+
+</div><!-- /root -->
+
+<script src="script.js"></script>
+</body>
+</html>

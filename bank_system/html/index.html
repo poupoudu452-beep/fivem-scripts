@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banque</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="bank-container" class="hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="bank-icon">🏦</div>
+                <span class="bank-title">Banque</span>
+            </div>
+
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">JD</div>
+                <div class="user-details">
+                    <div class="user-name" id="user-name">Jon Diaz</div>
+                    <div class="user-account" id="user-account-short">XXXXXXXX</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-page="dashboard" onclick="switchPage('dashboard')">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-page="deposit" onclick="switchPage('deposit')">
+                    <span class="nav-icon">💰</span>
+                    <span>Deposer</span>
+                </button>
+                <button class="nav-btn" data-page="withdraw" onclick="switchPage('withdraw')">
+                    <span class="nav-icon">💸</span>
+                    <span>Retirer</span>
+                </button>
+                <button class="nav-btn" data-page="transactions" onclick="switchPage('transactions')">
+                    <span class="nav-icon">📋</span>
+                    <span>Transactions</span>
+                </button>
+                <button class="nav-btn" data-page="account" onclick="switchPage('account')">
+                    <span class="nav-icon">👤</span>
+                    <span>Mon Compte</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span id="last-login">Derniere connexion: Maintenant</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Close button -->
+            <button class="close-btn" onclick="closeBank()">✕</button>
+
+            <!-- Dashboard Page -->
+            <div class="page active" id="page-dashboard">
+                <h1 class="page-title">Dashboard</h1>
+
+                <div class="stats-row">
+                    <div class="stat-card stat-balance">
+                        <div class="stat-icon">💳</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Solde actuel</span>
+                            <span class="stat-value" id="stat-balance">$0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-deposits">
+                        <div class="stat-icon">⬇</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Depots</span>
+                            <span class="stat-value" id="stat-deposits">$0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-withdrawals">
+                        <div class="stat-icon">⬆</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Retraits</span>
+                            <span class="stat-value" id="stat-withdrawals">$0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card bank-card">
+                        <div class="card-chip">💳</div>
+                        <div class="card-number" id="card-number">•••• •••• •••• 0000</div>
+                        <div class="card-bottom">
+                            <div>
+                                <span class="card-label">TITULAIRE</span>
+                                <span class="card-holder" id="card-holder">Jon Diaz</span>
+                            </div>
+                            <div class="card-brand">BANK</div>
+                        </div>
+                    </div>
+
+                    <div class="card account-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Type de compte:</span>
+                            <span class="detail-value">Standard</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Numero de compte:</span>
+                            <span class="detail-value" id="detail-account">XXXXXXXX</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Cree le:</span>
+                            <span class="detail-value" id="detail-created">Inconnu</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Statut:</span>
+                            <span class="detail-value status-active">Actif</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card recent-activity">
+                    <div class="activity-header">
+                        <h3>Activite recente</h3>
+                        <button class="view-all-btn" onclick="switchPage('transactions')">Voir tout</button>
+                    </div>
+                    <div id="recent-list" class="transaction-list">
+                        <div class="empty-state">Aucune transaction</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deposit Page -->
+            <div class="page" id="page-deposit">
+                <h1 class="page-title">Deposer de l'argent</h1>
+                <div class="card operation-card">
+                    <p class="operation-desc">Deposez l'argent liquide que vous avez sur vous dans votre compte bancaire.</p>
+                    <div class="amount-section">
+                        <label class="amount-label">Montant a deposer ($)</label>
+                        <div class="amount-input-wrap">
+                            <span class="currency-symbol">$</span>
+                            <input type="number" id="deposit-amount" class="amount-input" placeholder="0" min="1">
+                        </div>
+                        <div class="quick-amounts">
+                            <button class="quick-btn" onclick="setAmount('deposit', 100)">$100</button>
+                            <button class="quick-btn" onclick="setAmount('deposit', 500)">$500</button>
+                            <button class="quick-btn" onclick="setAmount('deposit', 1000)">$1,000</button>
+                            <button class="quick-btn" onclick="setAmount('deposit', 5000)">$5,000</button>
+                            <button class="quick-btn" onclick="setAmount('deposit', 10000)">$10,000</button>
+                            <button class="quick-btn quick-all" onclick="setAmountAll('deposit')">TOUT</button>
+                        </div>
+                    </div>
+                    <button class="action-btn deposit-btn" onclick="doDeposit()">Deposer</button>
+                    <div id="deposit-msg" class="operation-msg"></div>
+                </div>
+            </div>
+
+            <!-- Withdraw Page -->
+            <div class="page" id="page-withdraw">
+                <h1 class="page-title">Retirer de l'argent</h1>
+                <div class="card operation-card">
+                    <p class="operation-desc">Retirez de l'argent de votre compte bancaire. Vous le recevrez en liquide.</p>
+                    <div class="amount-section">
+                        <label class="amount-label">Montant a retirer ($)</label>
+                        <div class="amount-input-wrap">
+                            <span class="currency-symbol">$</span>
+                            <input type="number" id="withdraw-amount" class="amount-input" placeholder="0" min="1">
+                        </div>
+                        <div class="quick-amounts">
+                            <button class="quick-btn" onclick="setAmount('withdraw', 100)">$100</button>
+                            <button class="quick-btn" onclick="setAmount('withdraw', 500)">$500</button>
+                            <button class="quick-btn" onclick="setAmount('withdraw', 1000)">$1,000</button>
+                            <button class="quick-btn" onclick="setAmount('withdraw', 5000)">$5,000</button>
+                            <button class="quick-btn" onclick="setAmount('withdraw', 10000)">$10,000</button>
+                            <button class="quick-btn quick-all" onclick="setAmountAll('withdraw')">TOUT</button>
+                        </div>
+                    </div>
+                    <div class="balance-reminder">Solde disponible: <span id="withdraw-balance">$0</span></div>
+                    <button class="action-btn withdraw-btn" onclick="doWithdraw()">Retirer</button>
+                    <div id="withdraw-msg" class="operation-msg"></div>
+                </div>
+            </div>
+
+            <!-- Transactions Page -->
+            <div class="page" id="page-transactions">
+                <h1 class="page-title">Historique des transactions</h1>
+                <div class="card">
+                    <div id="transactions-list" class="transaction-list full-list">
+                        <div class="empty-state">Aucune transaction</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Page -->
+            <div class="page" id="page-account">
+                <h1 class="page-title">Informations du compte</h1>
+                <div class="card account-card-full">
+                    <div class="account-header">
+                        <div class="account-avatar-lg" id="account-avatar-lg">JD</div>
+                        <div>
+                            <h2 id="account-fullname">Jon Diaz</h2>
+                            <span class="account-badge">Compte Standard</span>
+                        </div>
+                    </div>
+                    <div class="account-grid">
+                        <div class="account-field">
+                            <span class="field-label">Numero de compte</span>
+                            <span class="field-value" id="account-number">XXXXXXXX</span>
+                        </div>
+                        <div class="account-field">
+                            <span class="field-label">Solde</span>
+                            <span class="field-value" id="account-balance">$0</span>
+                        </div>
+                        <div class="account-field">
+                            <span class="field-label">Date de creation</span>
+                            <span class="field-value" id="account-created">Inconnu</span>
+                        </div>
+                        <div class="account-field">
+                            <span class="field-label">Statut</span>
+                            <span class="field-value status-active">Actif</span>
+                        </div>
+                        <div class="account-field">
+                            <span class="field-label">Total depots</span>
+                            <span class="field-value" id="account-total-dep">$0</span>
+                        </div>
+                        <div class="account-field">
+                            <span class="field-label">Total retraits</span>
+                            <span class="field-value" id="account-total-wit">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

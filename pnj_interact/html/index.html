@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PNJ Interact</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+    <!-- ══ TROISIÈME ŒIL : Icône au centre ══ -->
+    <div id="thirdeye-overlay" class="hidden">
+        <div id="thirdeye-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+                <circle cx="12" cy="12" r="3.5"/>
+            </svg>
+        </div>
+
+        <!-- Label PNJ au survol -->
+        <div id="thirdeye-label" class="hidden">
+                <div class="thirdeye-label-inner">
+                    <div class="thirdeye-label-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="thirdeye-label-text">
+                        <span class="thirdeye-ped-name" id="thirdeye-ped-name">Inconnu</span>
+                        <!-- Barre de confiance (visible uniquement pour le receveur) -->
+                        <div class="thirdeye-trust-bar hidden" id="thirdeye-trust-bar">
+                            <span class="thirdeye-trust-label">Confiance</span>
+                            <div class="thirdeye-trust-track">
+                                <div class="thirdeye-trust-fill" id="thirdeye-trust-fill"></div>
+                            </div>
+                            <span class="thirdeye-trust-value" id="thirdeye-trust-value">0%</span>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+    <!-- ══ HUD DIALOGUE en bas de l'écran ══ -->
+    <div id="dialogue-hud" class="hidden">
+        <div class="dialogue-container">
+
+            <!-- Info PNJ -->
+            <div class="dialogue-npc">
+                <div class="dialogue-npc-avatar" id="dialogue-npc-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div class="dialogue-npc-info">
+                    <span class="dialogue-npc-name" id="dialogue-npc-name">Inconnu</span>
+                    <span class="dialogue-npc-tag">Habitant</span>
+                    <!-- Barre de confiance dans le dialogue (visible uniquement pour le receveur) -->
+                    <div class="dialogue-trust-bar hidden" id="dialogue-trust-bar">
+                        <span class="dialogue-trust-label">Confiance</span>
+                        <div class="dialogue-trust-track">
+                            <div class="dialogue-trust-fill" id="dialogue-trust-fill"></div>
+                        </div>
+                        <span class="dialogue-trust-value" id="dialogue-trust-value">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Texte du dialogue -->
+            <div class="dialogue-text-box">
+                <div class="dialogue-text" id="dialogue-text"></div>
+                <div class="dialogue-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+
+            <!-- Options de réponse -->
+            <div class="dialogue-responses" id="dialogue-responses">
+                <!-- Rempli dynamiquement par le JS -->
+            </div>
+
+            <!-- Bouton fermer -->
+            <button class="dialogue-close" id="dialogue-close" title="Fermer (ESC)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        console.log("[pnj_interact] NUI page chargée avec succès");
+    </script>
+</body>
+</html>

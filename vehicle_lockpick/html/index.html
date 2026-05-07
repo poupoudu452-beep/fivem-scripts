@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crochetage</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- ============ LOCKPICK (goupilles) ============ -->
+    <div id="lockpick-container" class="hidden">
+        <div class="lp-wrapper">
+            <!-- Barre de tension gauche -->
+            <div class="tension-bar">
+                <div class="tension-handle"></div>
+                <div class="tension-shaft"></div>
+            </div>
+
+            <!-- Boitier de la serrure -->
+            <div class="lock-housing">
+                <!-- Ligne superieure (shear line) -->
+                <div class="shear-line shear-top"></div>
+
+                <!-- Zone des goupilles -->
+                <div class="pins-area" id="pins-area">
+                    <!-- Les goupilles seront generees par JS -->
+                </div>
+
+                <!-- Ligne inferieure -->
+                <div class="shear-line shear-bottom"></div>
+            </div>
+
+            <!-- Indicateur souris -->
+            <div class="mouse-hint">
+                <div class="mouse-icon">
+                    <div class="mouse-body">
+                        <div class="mouse-wheel"></div>
+                    </div>
+                    <div class="scroll-arrows">
+                        <span class="arrow-up">&#9650;</span>
+                        <span class="arrow-down">&#9660;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <span class="key-hint">[CLIC]</span> Selectionner une goupille &nbsp;|&nbsp;
+            <span class="key-hint">[SCROLL]</span> Lever / baisser &nbsp;|&nbsp;
+            <span class="key-hint">[ECHAP]</span> Annuler
+        </div>
+    </div>
+
+    <!-- ============ HOTWIRE (cablage) ============ -->
+    <div id="hotwire-container" class="hidden">
+        <div class="hotwire-title">
+            <span class="title-icon">&#9889;</span>
+            <span id="hotwire-title-text">Cablage...</span>
+        </div>
+
+        <div class="hotwire-board">
+            <div class="wire-column wire-left" id="wire-left"></div>
+            <svg class="wire-svg" id="wire-svg" viewBox="0 0 420 360"></svg>
+            <div class="wire-column wire-right" id="wire-right"></div>
+        </div>
+
+        <div class="hotwire-status" id="hotwire-status">Connectez les fils par couleur</div>
+
+        <div class="instructions">
+            <span class="key-hint">[MAINTENIR]</span> Glissez le fil vers le connecteur de meme couleur &nbsp;|&nbsp;
+            <span class="key-hint">[ECHAP]</span> Annuler
+        </div>
+    </div>
+
+    <!-- ============ LOADING BAR (branchement) ============ -->
+    <div id="loading-container" class="hidden">
+        <div class="loading-wrapper">
+            <div class="loading-text" id="loading-text">Branchement des fils...</div>
+            <div class="loading-bar-bg">
+                <div class="loading-bar-fill" id="loading-bar-fill"></div>
+            </div>
+            <div class="loading-percent" id="loading-percent">0%</div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

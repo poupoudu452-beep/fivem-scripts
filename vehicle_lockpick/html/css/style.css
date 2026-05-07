@@ -1,0 +1,507 @@
+/* ============================================================
+   VEHICLE LOCKPICK — STYLE
+   ============================================================ */
+
+:root {
+    --bg-dark:      rgba(10, 10, 18, 0.85);
+    --bg-card:      rgba(20, 20, 40, 0.9);
+    --accent:       #e74c3c;
+    --accent-glow:  rgba(231, 76, 60, 0.4);
+    --success:      #2ecc71;
+    --success-glow: rgba(46, 204, 113, 0.4);
+    --gold:         #f39c12;
+    --gold-glow:    rgba(243, 156, 18, 0.3);
+    --text:         #e2e8f0;
+    --text-dim:     #94a3b8;
+    --metal:        #4a5568;
+    --metal-light:  #718096;
+    --metal-dark:   #2d3748;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    color: var(--text);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden { display: none !important; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0; transform: scale(0.9); }
+}
+
+.closing {
+    animation: fadeOut 0.25s ease-in forwards;
+}
+
+/* ============================================================
+   LOCKPICK — GOUPILLES
+   ============================================================ */
+
+#lockpick-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.lp-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+/* ─── Barre de tension (a gauche du boitier) ───────────────── */
+.tension-bar {
+    display: flex;
+    align-items: center;
+    margin-right: -2px;
+    z-index: 3;
+}
+
+.tension-handle {
+    width: 80px;
+    height: 10px;
+    background: linear-gradient(to bottom, #bbb, #999, #bbb);
+    border-radius: 3px 0 0 3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+    border: 1px solid #888;
+}
+
+.tension-shaft {
+    width: 20px;
+    height: 6px;
+    background: linear-gradient(to bottom, #ccc, #aaa, #ccc);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ─── Boitier de serrure ───────────────────────────────────── */
+.lock-housing {
+    width: 260px;
+    background: linear-gradient(180deg, #606068, #505058 20%, #48484f 50%, #404048 80%, #383840);
+    border-radius: 6px;
+    border: 2px solid #555;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+}
+
+/* ─── Shear lines (lignes de cisaillement haut/bas) ────────── */
+.shear-line {
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to bottom, #333, #555, #333);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.shear-top {
+    border-radius: 4px 4px 0 0;
+}
+
+.shear-bottom {
+    border-radius: 0 0 4px 4px;
+}
+
+/* ─── Zone des goupilles ───────────────────────────────────── */
+.pins-area {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 10px 14px;
+    height: 160px;
+    position: relative;
+}
+
+/* ─── Goupille individuelle ────────────────────────────────── */
+.pin-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    width: 24px;
+}
+
+.pin-channel {
+    width: 14px;
+    height: 130px;
+    background: linear-gradient(to right, #333, #3a3a42, #333);
+    border-radius: 2px;
+    position: relative;
+    border: 1px solid #2a2a30;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+.pin-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to right, #8a8a96, #a8a8b4, #8a8a96);
+    border-radius: 2px 2px 0 0;
+    transition: background 0.3s ease;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    min-height: 10px;
+}
+
+.pin-bar.correct {
+    background: linear-gradient(to right, #1fa855, #2ecc71, #1fa855);
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.5), 0 -2px 4px rgba(0,0,0,0.3);
+}
+
+.pin-bar.selected {
+    background: linear-gradient(to right, #c88c1a, #f1c40f, #c88c1a);
+    box-shadow: 0 0 8px rgba(241, 196, 15, 0.4), 0 -2px 4px rgba(0,0,0,0.3);
+}
+
+.pin-bar.locked {
+    background: linear-gradient(to right, #1fa855, #2ecc71, #1fa855);
+    box-shadow: 0 0 12px rgba(46, 204, 113, 0.6), 0 -2px 4px rgba(0,0,0,0.3);
+}
+
+/* Spring top (ressort en haut de la goupille) */
+.pin-spring {
+    position: absolute;
+    top: 0;
+    left: 2px;
+    right: 2px;
+    height: 20px;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        #666 2px,
+        #666 3px
+    );
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* ─── Goupille selectionnee ────────────────────────────────── */
+.pin-slot.active .pin-channel {
+    border-color: #f1c40f;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.5), 0 0 8px rgba(241, 196, 15, 0.3);
+}
+
+/* ─── Indicateur souris (a droite du boitier) ──────────────── */
+.mouse-hint {
+    margin-left: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.mouse-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.mouse-body {
+    width: 36px;
+    height: 54px;
+    background: linear-gradient(180deg, #ddd, #bbb);
+    border-radius: 18px 18px 18px 18px;
+    border: 2px solid #999;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+.mouse-wheel {
+    width: 8px;
+    height: 14px;
+    background: linear-gradient(to bottom, #888, #666);
+    border-radius: 4px;
+    margin-top: 10px;
+    border: 1px solid #555;
+}
+
+.scroll-arrows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.arrow-up, .arrow-down {
+    animation: scrollBounce 1.2s ease-in-out infinite;
+}
+
+.arrow-down {
+    animation-delay: 0.6s;
+}
+
+@keyframes scrollBounce {
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50%      { opacity: 1;   transform: translateY(-3px); }
+}
+
+/* ─── Animation de succes / echec ──────────────────────────── */
+@keyframes lockSuccess {
+    0%   { box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+    50%  { box-shadow: 0 4px 20px rgba(0,0,0,0.6), 0 0 30px rgba(46, 204, 113, 0.5); }
+    100% { box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+}
+
+@keyframes lockFail {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.lock-housing.success-flash {
+    animation: lockSuccess 0.6s ease;
+}
+
+.lock-housing.fail-shake {
+    animation: lockFail 0.4s ease;
+}
+
+/* ─── Instructions ─────────────────────────────────────────── */
+.instructions {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+}
+
+.key-hint {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    font-family: monospace;
+}
+
+/* ============================================================
+   HOTWIRE — CABLAGE
+   ============================================================ */
+
+#hotwire-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 28px;
+    background: transparent;
+    border-radius: 16px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.hotwire-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold);
+    text-shadow: 0 0 12px var(--gold-glow);
+}
+
+.title-icon { font-size: 22px; }
+
+.hotwire-board {
+    width: 420px;
+    height: 360px;
+    background: linear-gradient(145deg, #1a1a2e 0%, #111122 100%);
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 2px 20px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: visible;
+    user-select: none;
+}
+
+.wire-column {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20px 0;
+    width: 60px;
+    z-index: 2;
+}
+
+.wire-left  { left: 0; }
+.wire-right { right: 0; }
+
+.wire-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.wire-connector {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    position: relative;
+    font-size: 16px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    margin: 0 auto;
+}
+
+.wire-connector:hover { transform: scale(1.1); border-color: rgba(255, 255, 255, 0.4); }
+
+.wire-connector.dragging {
+    transform: scale(1.15);
+    box-shadow: 0 0 20px currentColor;
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+.wire-connector.drop-target {
+    transform: scale(1.15);
+    box-shadow: 0 0 16px currentColor;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.wire-connector.connected {
+    opacity: 0.5;
+    pointer-events: none;
+    transform: scale(0.95);
+}
+
+@keyframes pinFail {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+    20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+
+.wire-connector.wrong {
+    animation: pinFail 0.4s ease;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 12px var(--accent-glow) !important;
+}
+
+.wire-connector.wire-red    { background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fdd; }
+.wire-connector.wire-blue   { background: linear-gradient(135deg, #2471a3, #3498db); color: #def; }
+.wire-connector.wire-yellow { background: linear-gradient(135deg, #d4ac0d, #f1c40f); color: #554; }
+.wire-connector.wire-green  { background: linear-gradient(135deg, #1e8449, #2ecc71); color: #dfd; }
+.wire-connector.wire-pink   { background: linear-gradient(135deg, #9b59b6, #e91e90); color: #fdf; }
+.wire-connector.wire-orange { background: linear-gradient(135deg, #d35400, #e67e22); color: #fed; }
+
+.wire-connector::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 16px;
+    background: linear-gradient(to right, #aaa, #ddd, #aaa);
+    border-radius: 2px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.wire-left .wire-connector::after  { right: -10px; }
+.wire-right .wire-connector::after { left: -10px; }
+
+.connector-symbol { font-size: 18px; pointer-events: none; }
+
+.hotwire-status {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 500;
+    min-height: 20px;
+    transition: color 0.3s;
+}
+
+.hotwire-status.success-text { color: var(--success); text-shadow: 0 0 8px var(--success-glow); }
+.hotwire-status.fail-text    { color: var(--accent); }
+
+/* ============================================================
+   LOADING BAR — BRANCHEMENT
+   ============================================================ */
+
+#loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.loading-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 40px;
+    background: transparent;
+    border-radius: 12px;
+}
+
+.loading-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold);
+    text-shadow: 0 0 10px var(--gold-glow);
+}
+
+.loading-bar-bg {
+    width: 300px;
+    height: 10px;
+    background: var(--metal-dark);
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.loading-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--success));
+    border-radius: 5px;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px var(--gold-glow);
+}
+
+.loading-percent {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    font-family: monospace;
+}

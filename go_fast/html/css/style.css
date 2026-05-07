@@ -1,0 +1,171 @@
+/* =============================================
+   GO FAST — Timer HUD
+   ============================================= */
+
+:root {
+    --c-bg:          rgba(12, 12, 20, 0.92);
+    --c-bg-lt:       rgba(18, 18, 28, 0.88);
+    --c-border:      rgba(60, 70, 100, 0.3);
+    --c-accent:      #3b82f6;
+    --c-accent-lt:   #60a5fa;
+    --c-accent-bg:   rgba(59, 130, 246, 0.1);
+    --c-accent-glow: rgba(59, 130, 246, 0.4);
+    --c-text:        #e2e8f0;
+    --c-text-dim:    rgba(200, 210, 230, 0.55);
+    --c-white:       #ffffff;
+    --radius:        8px;
+    --radius-lg:     14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: transparent !important;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    overflow: hidden;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+.hidden { display: none !important; }
+
+/* =============================================
+   TIMER WIDGET
+   ============================================= */
+#timer-hud {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9000;
+    pointer-events: none;
+    animation: timerSlideDown 0.4s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes timerSlideDown {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.timer-container {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    padding: 12px 20px 12px 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(0, 0, 0, 0.2),
+                0 0 20px rgba(59, 130, 246, 0.08);
+    min-width: 280px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ligne decorative en haut */
+.timer-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--c-accent), transparent);
+    border-radius: 99px;
+    opacity: 0.5;
+}
+
+/* --- Icone horloge --- */
+.timer-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--c-accent-bg);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.15);
+}
+
+.timer-icon svg {
+    width: 20px;
+    height: 20px;
+    color: var(--c-accent-lt);
+}
+
+/* --- Infos --- */
+.timer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.timer-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--c-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.timer-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.timer-time {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--c-white);
+    letter-spacing: 1.5px;
+    font-variant-numeric: tabular-nums;
+    min-width: 62px;
+}
+
+/* --- Barre de progression --- */
+.timer-bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    min-width: 80px;
+}
+
+.timer-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 1s linear, background 0.5s ease;
+    width: 100%;
+    background: linear-gradient(90deg, var(--c-accent), var(--c-accent-lt));
+    box-shadow: 0 0 8px var(--c-accent-glow);
+}
+
+/* Couleurs dynamiques selon le temps restant */
+.timer-bar-fill.timer-warning {
+    background: linear-gradient(90deg, #f59e0b, #eab308);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.timer-bar-fill.timer-danger {
+    background: linear-gradient(90deg, #ef4444, #f97316);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+    animation: dangerPulse 1s ease-in-out infinite;
+}
+
+@keyframes dangerPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.7; }
+}
+
+/* Temps critique : le texte clignote aussi */
+.timer-time.timer-danger {
+    color: #ef4444;
+    animation: dangerPulse 1s ease-in-out infinite;
+}

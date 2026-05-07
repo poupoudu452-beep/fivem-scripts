@@ -1,0 +1,650 @@
+/* =============================================
+   PNJ INTERACT — Third Eye + Dialogue HUD
+   ============================================= */
+
+/* Font chargée dans le HTML pour éviter le blocage CSS */
+
+:root {
+    --c-bg:          rgba(12, 12, 20, 0.92);
+    --c-bg-lt:       rgba(18, 18, 28, 0.88);
+    --c-border:      rgba(60, 70, 100, 0.3);
+    --c-accent:      #3b82f6;
+    --c-accent-lt:   #60a5fa;
+    --c-accent-bg:   rgba(59, 130, 246, 0.1);
+    --c-accent-glow: rgba(59, 130, 246, 0.4);
+
+    /* Couleur active quand PNJ détecté */
+    --c-active:      #22c55e;
+    --c-active-lt:   #4ade80;
+    --c-active-bg:   rgba(34, 197, 94, 0.12);
+    --c-active-glow: rgba(34, 197, 94, 0.5);
+
+    --c-text:        #e2e8f0;
+    --c-text-dim:    rgba(200, 210, 230, 0.55);
+    --c-text-muted:  rgba(160, 175, 200, 0.4);
+    --c-white:       #ffffff;
+    --radius:        8px;
+    --radius-lg:     14px;
+    --radius-xl:     20px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: transparent !important;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    overflow: hidden;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+.hidden { display: none !important; }
+
+
+/* =============================================
+   CACHER LE CURSEUR quand third eye actif
+   ============================================= */
+body.thirdeye-active,
+body.thirdeye-active * {
+    cursor: none !important;
+}
+
+
+/* =============================================
+   TROISIÈME ŒIL — Overlay
+   ============================================= */
+#thirdeye-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9000;
+    pointer-events: none;
+    animation: fadeIn .15s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* --- Icone oeil au centre ------------------- */
+#thirdeye-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: eyePulse 2s ease-in-out infinite;
+    transition: filter .25s ease;
+}
+#thirdeye-icon svg {
+    width: 32px;
+    height: 32px;
+    color: var(--c-white);
+    filter: drop-shadow(0 0 12px var(--c-accent-glow))
+            drop-shadow(0 0 24px rgba(59, 130, 246, 0.2));
+    transition: color .25s ease, filter .25s ease;
+}
+
+@keyframes eyePulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1);   opacity: 0.85; }
+    50%      { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+/* --- ÉTAT ACTIF : PNJ détecté (vert) -------- */
+#thirdeye-overlay.ped-detected #thirdeye-icon svg {
+    color: var(--c-active-lt);
+    filter: drop-shadow(0 0 14px var(--c-active-glow))
+            drop-shadow(0 0 28px rgba(34, 197, 94, 0.25));
+}
+#thirdeye-overlay.ped-detected #thirdeye-icon::before {
+    border-color: rgba(34, 197, 94, 0.35);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.15);
+}
+#thirdeye-overlay.ped-detected #thirdeye-icon::after {
+    border-color: rgba(34, 197, 94, 0.12);
+    border-top-color: rgba(34, 197, 94, 0.4);
+}
+
+/* --- Cercle décoratif autour de l'œil ------ */
+#thirdeye-icon::before {
+    content: '';
+    position: absolute;
+    width: 52px;
+    height: 52px;
+    border: 1.5px solid rgba(59, 130, 246, 0.25);
+    border-radius: 50%;
+    animation: ringRotate 4s linear infinite;
+    transition: border-color .25s ease, box-shadow .25s ease;
+}
+#thirdeye-icon::after {
+    content: '';
+    position: absolute;
+    width: 62px;
+    height: 62px;
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    border-top-color: rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
+    animation: ringRotate 6s linear infinite reverse;
+    transition: border-color .25s ease;
+}
+
+@keyframes ringRotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+
+/* --- Label PNJ (apparaît au survol) --------- */
+#thirdeye-label {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 50px);
+    z-index: 9001;
+    pointer-events: none;
+    animation: labelSlideUp .2s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes labelSlideUp {
+    from { opacity: 0; transform: translate(-50%, 60px); }
+    to   { opacity: 1; transform: translate(-50%, 50px); }
+}
+
+.thirdeye-label-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--c-bg);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 10px 16px 10px 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(0,0,0,0.2),
+                0 0 16px rgba(34, 197, 94, 0.1);
+    min-width: 200px;
+}
+
+.thirdeye-label-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--c-active-bg);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.thirdeye-label-icon svg {
+    width: 18px;
+    height: 18px;
+    color: var(--c-active-lt);
+}
+
+.thirdeye-label-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+.thirdeye-ped-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--c-text);
+    letter-spacing: 0.3px;
+}
+
+
+/* =============================================
+   BARRE DE CONFIANCE (troisième œil)
+   ============================================= */
+.thirdeye-trust-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+.thirdeye-trust-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--c-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+}
+
+.thirdeye-trust-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    min-width: 80px;
+}
+
+.thirdeye-trust-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.5s ease, background 0.5s ease;
+    width: 0%;
+}
+
+.thirdeye-trust-fill.trust-low {
+    background: linear-gradient(90deg, #ef4444, #f97316);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.thirdeye-trust-fill.trust-mid {
+    background: linear-gradient(90deg, #f59e0b, #eab308);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.thirdeye-trust-fill.trust-high {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+.thirdeye-trust-value {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--c-text);
+    min-width: 28px;
+    text-align: right;
+}
+
+/* --- Barre de confiance dans le dialogue --- */
+.dialogue-trust-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    width: 100%;
+}
+
+.dialogue-trust-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--c-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+}
+
+.dialogue-trust-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    min-width: 80px;
+}
+
+.dialogue-trust-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.5s ease, background 0.5s ease;
+    width: 0%;
+}
+
+.dialogue-trust-fill.trust-low {
+    background: linear-gradient(90deg, #ef4444, #f97316);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.dialogue-trust-fill.trust-mid {
+    background: linear-gradient(90deg, #f59e0b, #eab308);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.dialogue-trust-fill.trust-high {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+.dialogue-trust-value {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--c-text);
+    min-width: 28px;
+    text-align: right;
+}
+
+
+/* =============================================
+   DIALOGUE HUD — Bas de l'écran
+   ============================================= */
+#dialogue-hud {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9500;
+    display: flex;
+    justify-content: center;
+    padding: 0 40px 30px;
+    pointer-events: none;
+    animation: dialogueSlideUp .3s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes dialogueSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.dialogue-container {
+    position: relative;
+    width: 100%;
+    max-width: 750px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-xl);
+    padding: 20px 24px;
+    box-shadow: 0 -4px 40px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(0,0,0,0.2),
+                0 0 60px rgba(59, 130, 246, 0.06);
+    pointer-events: all;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Ligne décorative en haut */
+.dialogue-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--c-accent), transparent);
+    border-radius: 99px;
+    opacity: 0.5;
+}
+
+
+/* --- Info PNJ ------------------------------- */
+.dialogue-npc {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dialogue-npc-avatar {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--c-accent-bg), rgba(59,130,246,0.05));
+    border: 1.5px solid rgba(59, 130, 246, 0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.15);
+    overflow: hidden;
+}
+.dialogue-npc-avatar svg {
+    width: 22px;
+    height: 22px;
+    color: var(--c-accent-lt);
+}
+.dialogue-npc-avatar.has-headshot {
+    background: #1a1a2e;
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+.dialogue-npc-avatar.has-headshot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.dialogue-npc-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.dialogue-npc-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--c-white);
+    letter-spacing: 0.3px;
+}
+.dialogue-npc-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--c-accent-lt);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+
+/* --- Texte du dialogue ---------------------- */
+.dialogue-text-box {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.dialogue-text {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--c-text);
+    line-height: 1.65;
+    letter-spacing: 0.2px;
+    padding: 14px 18px;
+    background: var(--c-bg-lt);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    position: relative;
+}
+
+/* Petit triangle pointant vers le PNJ */
+.dialogue-text::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 20px;
+    width: 12px;
+    height: 12px;
+    background: var(--c-bg-lt);
+    border-left: 1px solid var(--c-border);
+    border-top: 1px solid var(--c-border);
+    transform: rotate(45deg);
+}
+
+/* Indicateur "en train d'écrire" */
+.dialogue-indicator {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding-bottom: 8px;
+    opacity: 0;
+    transition: opacity .3s;
+}
+.dialogue-indicator.typing {
+    opacity: 1;
+}
+.dialogue-indicator span {
+    width: 5px;
+    height: 5px;
+    background: var(--c-accent);
+    border-radius: 50%;
+    animation: typingDot 1.4s ease-in-out infinite;
+}
+.dialogue-indicator span:nth-child(2) { animation-delay: .2s; }
+.dialogue-indicator span:nth-child(3) { animation-delay: .4s; }
+
+@keyframes typingDot {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+    40%           { transform: scale(1);   opacity: 1; }
+}
+
+
+/* --- Options de réponse --------------------- */
+.dialogue-responses {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.response-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    color: var(--c-text);
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all .15s ease;
+    flex: 1;
+    min-width: 140px;
+    justify-content: center;
+}
+.response-btn:hover {
+    background: var(--c-accent-bg);
+    border-color: rgba(59, 130, 246, 0.35);
+    color: var(--c-white);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+}
+.response-btn:active {
+    transform: translateY(0);
+}
+
+.response-btn .response-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.response-btn .response-icon svg {
+    width: 14px;
+    height: 14px;
+    color: var(--c-accent-lt);
+}
+
+/* Numero de raccourci */
+.response-btn .response-key {
+    width: 20px;
+    height: 20px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--c-text-muted);
+    flex-shrink: 0;
+}
+
+
+/* --- Bouton fermer -------------------------- */
+.dialogue-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 26px;
+    height: 26px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    color: var(--c-text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+}
+.dialogue-close:hover {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #ef4444;
+}
+
+
+/* =============================================
+   ANIMATIONS UTILITAIRES
+   ============================================= */
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+.dialogue-text.typing-anim {
+    overflow: hidden;
+}
+
+
+/* =============================================
+   SCROLLBAR
+   ============================================= */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 99px; }
+
+
+/* =============================================
+   NOTIFICATIONS
+   ============================================= */
+.notification {
+    position: fixed;
+    top: 40px;
+    right: 40px;
+    z-index: 99999;
+    padding: 14px 22px;
+    border-radius: var(--radius-lg);
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--c-white);
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    animation: notifSlideIn .3s ease;
+    transition: opacity .5s ease;
+}
+.notification.success {
+    border-color: rgba(34, 197, 94, 0.4);
+    background: rgba(12, 12, 20, 0.95);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(34, 197, 94, 0.15);
+    color: var(--c-active-lt);
+}
+.notification.error {
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(12, 12, 20, 0.95);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+}
+.notification.fade-out {
+    opacity: 0;
+}
+@keyframes notifSlideIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
