@@ -402,6 +402,79 @@ AddEventHandler('go_fast:requestDealerPaid', function()
 end)
 
 -- ═══════════════════════════════════════════
+--  COMMANDE /setreput [ID] [Pourcentage]
+-- ═══════════════════════════════════════════
+
+RegisterCommand('setreput', function(source, args, rawCommand)
+    local src = source
+
+    -- Vérifier que c'est un admin/fondateur (ou la console serveur si src == 0)
+    if src ~= 0 then
+        local isFounder = false
+        local ok, result = pcall(function() return exports['admin_menu']:isFounder(src) end)
+        if ok and result then isFounder = true end
+
+        if not isFounder then
+            TriggerClientEvent('chatMessage', src, '', {255, 0, 0}, '[go_fast] Tu n\'as pas la permission d\'utiliser cette commande.')
+            return
+        end
+    end
+
+    -- Vérifier les arguments
+    if not args[1] or not args[2] then
+        if src == 0 then
+            print('[go_fast] Usage: /setreput [ID joueur] [Pourcentage 0-100]')
+        else
+            TriggerClientEvent('chatMessage', src, '', {255, 255, 0}, 'Usage: /setreput [ID joueur] [Pourcentage 0-100]')
+        end
+        return
+    end
+
+    local targetId = tonumber(args[1])
+    local newTrust = tonumber(args[2])
+
+    if not targetId or not newTrust then
+        if src == 0 then
+            print('[go_fast] Erreur: ID et pourcentage doivent être des nombres.')
+        else
+            TriggerClientEvent('chatMessage', src, '', {255, 0, 0}, 'Erreur: ID et pourcentage doivent être des nombres.')
+        end
+        return
+    end
+
+    -- Vérifier que le pourcentage est entre 0 et 100
+    if newTrust < 0 then newTrust = 0 end
+    if newTrust > 100 then newTrust = 100 end
+
+    -- Vérifier que le joueur cible est connecté
+    local targetName = GetPlayerName(targetId)
+    if not targetName then
+        if src == 0 then
+            print('[go_fast] Erreur: Joueur ID ' .. targetId .. ' introuvable (pas connecté).')
+        else
+            TriggerClientEvent('chatMessage', src, '', {255, 0, 0}, 'Erreur: Joueur ID ' .. targetId .. ' introuvable (pas connecté).')
+        end
+        return
+    end
+
+    -- Mettre à jour la réputation
+    SetPlayerTrust(targetId, newTrust)
+
+    -- Synchroniser côté client du joueur cible
+    TriggerClientEvent('go_fast:updateTrust', targetId, newTrust)
+
+    -- Confirmer au joueur qui a exécuté la commande
+    if src == 0 then
+        print('[go_fast] Réputation de ' .. targetName .. ' (ID: ' .. targetId .. ') définie à ' .. newTrust .. '%')
+    else
+        TriggerClientEvent('chatMessage', src, '', {0, 255, 0}, '[go_fast] Réputation de ' .. targetName .. ' (ID: ' .. targetId .. ') définie à ' .. newTrust .. '%')
+    end
+
+    -- Notifier le joueur cible
+    TriggerClientEvent('chatMessage', targetId, '', {0, 255, 255}, '[go_fast] Ta réputation a été définie à ' .. newTrust .. '% par un administrateur.')
+end, true) -- true = commande restreinte (nécessite ace permission ou vérification interne)
+
+-- ═══════════════════════════════════════════
 --  INIT (chargé AVANT que les events soient traités)
 -- ═══════════════════════════════════════════
 
