@@ -269,6 +269,15 @@ AddEventHandler('go_fast:getDealerVehicleSpawn', function(dx, dy, dz)
         -- Pas de spawn défini, utiliser position par défaut (à côté du dealer)
         TriggerClientEvent('go_fast:startMissionWithSpawn', src, nil, drugType, drugAmount)
     end
+
+    -- Alerter la police qu'un Go Fast vient de demarrer
+    local playerPed = GetPlayerPed(src)
+    local playerCoords = GetEntityCoords(playerPed)
+    TriggerEvent('police:goFastAlert', nil, {
+        x = playerCoords.x,
+        y = playerCoords.y,
+        z = playerCoords.z,
+    })
 end)
 
 -- Relayer l'attaque d'un dealer à tous les clients
