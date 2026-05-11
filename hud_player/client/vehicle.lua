@@ -38,6 +38,11 @@ Citizen.CreateThread(function()
   Wait(0)
   SetRadarBigmapEnabled(false, false)
 
+  -- Remonter la minimap pour laisser la place aux icones de statut en dessous
+  SetMinimapComponentPosition('minimap', 'L', 'B', 0.0, -0.025, 0.15, 0.20)
+  SetMinimapComponentPosition('minimap_mask', 'L', 'B', 0.0, -0.025, 0.15, 0.20)
+  SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.01, -0.035, 0.18, 0.24)
+
   while true do
     Citizen.Wait(0)
     DisplayHud(false)

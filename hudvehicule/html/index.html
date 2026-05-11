@@ -139,9 +139,8 @@
     align-items: center;
     gap: 14px;
     padding: 6px 16px;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.35);
     border-radius: 20px;
-    backdrop-filter: blur(8px);
     border: 1px solid rgba(255,255,255,0.06);
   }
 
@@ -225,8 +224,7 @@
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
   .blink { animation: blink 0.8s ease-in-out infinite; }
 
-  /* Alerts */
-  #fuel-alert {
+  #stall-alert {
     position: fixed; top: 80px; left: 50%;
     transform: translateX(-50%);
     background: rgba(239,68,68,0.15);
@@ -234,21 +232,6 @@
     color: #ef4444;
     font-size: 12px; font-weight: 600; letter-spacing: 2px;
     padding: 8px 24px; border-radius: 8px;
-    backdrop-filter: blur(6px);
-    opacity: 0; transition: opacity 0.5s;
-    pointer-events: none; text-transform: uppercase;
-  }
-  #fuel-alert.show { opacity: 1; animation: blink 1.2s ease-in-out infinite; }
-
-  #stall-alert {
-    position: fixed; top: 120px; left: 50%;
-    transform: translateX(-50%);
-    background: rgba(239,68,68,0.12);
-    border: 1px solid rgba(239,68,68,0.4);
-    color: #ef4444;
-    font-size: 12px; font-weight: 600; letter-spacing: 2px;
-    padding: 8px 24px; border-radius: 8px;
-    backdrop-filter: blur(6px);
     opacity: 0; transition: opacity 0.4s;
     pointer-events: none; text-transform: uppercase;
   }
@@ -257,7 +240,6 @@
 </head>
 <body>
 
-<div id="fuel-alert">&#9888; PANNE SÈCHE</div>
 <div id="stall-alert">&#9888; MOTEUR DÉFAILLANT</div>
 
 <div id="hud-wrapper">
@@ -335,12 +317,11 @@ const gearEl      = document.getElementById('gear-indicator');
 const fuelArcEl   = document.getElementById('fuelArc');
 const fuelNumEl   = document.getElementById('fuel-number');
 const fuelIconEl  = document.getElementById('fuel-icon');
-const fuelAlertEl = document.getElementById('fuel-alert');
+
 const engineLight = document.getElementById('engine-light');
 const stallAlertEl= document.getElementById('stall-alert');
 const hudWrapper  = document.getElementById('hud-wrapper');
 
-let isEmptyAlerted = false;
 let stallAlertTimer = null;
 let lastKmh = 0;
 
@@ -432,12 +413,6 @@ function updateEngine(state) {
   }
 }
 
-function showEmptyAlert() {
-  if (isEmptyAlerted) return;
-  isEmptyAlerted = true;
-  fuelAlertEl.classList.add('show');
-}
-
 function showStallAlert() {
   stallAlertEl.classList.add('show');
   if (stallAlertTimer) clearTimeout(stallAlertTimer);
@@ -451,9 +426,7 @@ function toggleHUD(visible) {
     hudWrapper.classList.remove('visible');
     setTimeout(() => {
       updateSpeed(0);
-      fuelAlertEl.classList.remove('show');
       stallAlertEl.classList.remove('show');
-      isEmptyAlerted = false;
     }, 600);
   }
 }
@@ -464,7 +437,7 @@ window.addEventListener('message', function(e) {
   if (d.type === 'toggleHUD')    toggleHUD(d.visible);
   if (d.type === 'updateSpeed')  updateSpeed(d.speed);
   if (d.type === 'updateFuel')   updateFuel(d.fuel);
-  if (d.type === 'fuelEmpty')    showEmptyAlert();
+
   if (d.type === 'updateEngine') updateEngine(d.state);
   if (d.type === 'engineStall')  showStallAlert();
 });

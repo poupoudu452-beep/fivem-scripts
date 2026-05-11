@@ -160,11 +160,6 @@ Citizen.CreateThread(function()
                 pct         = math.floor(enginePct),
             })
 
-            -- ── Alerte panne sèche ──────────────────────────────────
-            if fuel <= 0.0 then
-                SendNUIMessage({ type = "fuelEmpty" })
-            end
-
             -- Envoi NUI
             SendNUIMessage({ type = "updateSpeed", speed = speedKmh })
             SendNUIMessage({ type = "updateFuel",  fuel  = fuel      })
