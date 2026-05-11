@@ -1,0 +1,156 @@
+/* ══════════════════════════════════════════════════════════════
+   hud_player — NUI Styles (circular icons design)
+══════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: transparent;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  pointer-events: none;
+}
+
+/* ── NOM DE RUE ──────────────────────────────────────────────── */
+#street-wrapper {
+  position: absolute;
+  bottom: 230px;
+  left: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 8px;
+  background: rgba(0,0,0,0.75);
+  border-radius: 10px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+  max-width: 280px;
+}
+#street-wrapper.visible { opacity: 1; transform: translateY(0); }
+
+#street-initial {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+#street-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#street-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── STATS WRAPPER ───────────────────────────────────────────── */
+#stats-wrapper {
+  position: absolute;
+  bottom: 28px;
+  left: 28px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+              transform 0.55s cubic-bezier(0.22,1,0.36,1),
+              left 0.4s ease,
+              flex-direction 0s;
+}
+#stats-wrapper.visible { opacity: 1; transform: translateY(0); }
+#stats-wrapper.in-vehicle {
+  left: 320px;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── CERCLE INDIVIDUEL ───────────────────────────────────────── */
+.stat-circle {
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+
+.stat-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 3;
+}
+
+.ring-fill {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 119.38;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.4s ease, stroke 0.3s ease;
+}
+
+.stat-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.3s;
+}
+
+/* ── COULEURS PAR STAT ───────────────────────────────────────── */
+
+/* HP — rose/rouge */
+.hp-ring { stroke: #f472b6; }
+#stat-hp .stat-icon { color: #f472b6; filter: drop-shadow(0 0 4px rgba(244,114,182,0.5)); }
+
+/* ARMURE — cyan */
+.arm-ring { stroke: #22d3ee; }
+#stat-arm .stat-icon { color: #22d3ee; filter: drop-shadow(0 0 4px rgba(34,211,238,0.5)); }
+
+/* FAIM — ambre/orange */
+.hng-ring { stroke: #f59e0b; }
+#stat-hng .stat-icon { color: #f59e0b; filter: drop-shadow(0 0 4px rgba(245,158,11,0.5)); }
+
+/* SOIF — bleu */
+.thr-ring { stroke: #60a5fa; }
+#stat-thr .stat-icon { color: #60a5fa; filter: drop-shadow(0 0 4px rgba(96,165,250,0.5)); }
+
+/* ENDURANCE — violet */
+.stm-ring { stroke: #a855f7; }
+#stat-stm .stat-icon { color: #a855f7; filter: drop-shadow(0 0 4px rgba(168,85,247,0.5)); }
+
+/* ── LOW STATE ───────────────────────────────────────────────── */
+.stat-circle.low .stat-icon {
+  animation: iconPulse 1s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

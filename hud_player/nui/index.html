@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<title>Player HUD</title>
+<link rel="stylesheet" href="style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- NOM DE RUE — visible uniquement en vehicule -->
+  <div id="street-wrapper">
+    <div id="street-initial">S</div>
+    <div id="street-info">
+      <span id="street-name">—</span>
+    </div>
+  </div>
+
+  <!-- BARRES DE STATUT JOUEUR — icones circulaires -->
+  <div id="stats-wrapper">
+
+    <!-- HP -->
+    <div class="stat-circle" id="stat-hp">
+      <svg class="stat-ring" viewBox="0 0 44 44">
+        <circle class="ring-bg" cx="22" cy="22" r="19"/>
+        <circle class="ring-fill hp-ring" id="hp-ring" cx="22" cy="22" r="19"/>
+      </svg>
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </div>
+    </div>
+
+    <!-- ARMURE -->
+    <div class="stat-circle" id="stat-arm">
+      <svg class="stat-ring" viewBox="0 0 44 44">
+        <circle class="ring-bg" cx="22" cy="22" r="19"/>
+        <circle class="ring-fill arm-ring" id="arm-ring" cx="22" cy="22" r="19"/>
+      </svg>
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      </div>
+    </div>
+
+    <!-- FAIM -->
+    <div class="stat-circle" id="stat-hng">
+      <svg class="stat-ring" viewBox="0 0 44 44">
+        <circle class="ring-bg" cx="22" cy="22" r="19"/>
+        <circle class="ring-fill hng-ring" id="hng-ring" cx="22" cy="22" r="19"/>
+      </svg>
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>
+      </div>
+    </div>
+
+    <!-- SOIF -->
+    <div class="stat-circle" id="stat-thr">
+      <svg class="stat-ring" viewBox="0 0 44 44">
+        <circle class="ring-bg" cx="22" cy="22" r="19"/>
+        <circle class="ring-fill thr-ring" id="thr-ring" cx="22" cy="22" r="19"/>
+      </svg>
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2C20 10.48 17.33 6.55 12 2z"/></svg>
+      </div>
+    </div>
+
+    <!-- ENDURANCE -->
+    <div class="stat-circle" id="stat-stm">
+      <svg class="stat-ring" viewBox="0 0 44 44">
+        <circle class="ring-bg" cx="22" cy="22" r="19"/>
+        <circle class="ring-fill stm-ring" id="stm-ring" cx="22" cy="22" r="19"/>
+      </svg>
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
