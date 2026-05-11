@@ -46,8 +46,10 @@ function toggleHUD(visible) {
 function toggleVehicle(inVehicle) {
   if (inVehicle) {
     streetWrapper.classList.add('visible');
+    statsWrapper.classList.add('in-vehicle');
   } else {
     streetWrapper.classList.remove('visible');
+    statsWrapper.classList.remove('in-vehicle');
   }
 }
 

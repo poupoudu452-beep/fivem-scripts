@@ -66,17 +66,23 @@ body {
 #stats-wrapper {
   position: absolute;
   bottom: 28px;
-  left: 290px;
+  left: 28px;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;
+  gap: 8px;
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1),
               transform 0.55s cubic-bezier(0.22,1,0.36,1),
-              left 0.45s cubic-bezier(0.22,1,0.36,1);
+              left 0.4s ease,
+              flex-direction 0s;
 }
 #stats-wrapper.visible { opacity: 1; transform: translateY(0); }
+#stats-wrapper.in-vehicle {
+  left: 320px;
+  flex-direction: column;
+  gap: 6px;
+}
 
 /* ── CERCLE INDIVIDUEL ───────────────────────────────────────── */
 .stat-circle {
