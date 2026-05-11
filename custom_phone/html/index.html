@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iFruit 17 Pro Max</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="camera-vignette"></div>
+
+    <!-- ==================== NOTIFICATION POPUP (telephone peek) ==================== -->
+    <div id="notif-container" class="notif-hidden">
+        <div id="notif-phone-frame">
+            <div id="notif-notch">
+                <div id="notif-notch-camera"></div>
+            </div>
+            <div id="notif-status-bar">
+                <span id="notif-status-time">12:00</span>
+                <div id="notif-status-icons">
+                    <div class="signal-bars">
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                    </div>
+                    <span class="status-text">5G</span>
+                    <div class="battery-icon">
+                        <div class="battery-body">
+                            <div class="battery-fill"></div>
+                        </div>
+                        <div class="battery-tip"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="notif-banner">
+                <div id="notif-app-icon">
+                    <svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                </div>
+                <div id="notif-content">
+                    <div id="notif-header">
+                        <span id="notif-app-name">Messages</span>
+                        <span id="notif-time">maintenant</span>
+                    </div>
+                    <div id="notif-sender"></div>
+                    <div id="notif-text"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="phone-container" class="hidden">
+        <!-- Boutons physiques -->
+        <div id="btn-power" title="Mise en veille"></div>
+        <div id="btn-action" title="Action"></div>
+        <div id="btn-vol-up" title="Volume +"></div>
+        <div id="btn-vol-down" title="Volume -"></div>
+
+        <div id="phone-frame">
+            <!-- Dynamic Island -->
+            <div id="phone-notch">
+                <div id="notch-camera"></div>
+            </div>
+
+            <!-- Barre de statut -->
+            <div id="status-bar">
+                <span id="status-time">12:00</span>
+                <div id="status-icons">
+                    <div class="signal-bars">
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                        <div class="signal-bar"></div>
+                    </div>
+                    <span class="status-text">5G</span>
+                    <div class="battery-icon">
+                        <div class="battery-body">
+                            <div class="battery-fill"></div>
+                        </div>
+                        <div class="battery-tip"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ecran principal -->
+            <div id="phone-screen">
+                <!-- Ecran de verrouillage -->
+                <div id="lock-screen">
+                    <div id="lock-time">12:00</div>
+                    <div id="lock-date">Lundi 1 Janvier</div>
+                    <div id="lock-bottom">
+                        <div id="lock-unlock-bar">
+                            <div id="lock-bar-line"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ecran camera -->
+                <div id="camera-screen" class="screen-hidden">
+                    <div id="camera-top-bar">
+                        <div id="camera-flash-btn" class="cam-top-btn" title="Flash">
+                            <svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+                        </div>
+                        <div id="camera-night-btn" class="cam-top-btn" title="Nuit">
+                            <svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M9 2c-1.05 0-2.05.16-3 .46 4.06 1.27 7 5.06 7 9.54s-2.94 8.27-7 9.54c.95.3 1.95.46 3 .46 5.52 0 10-4.48 10-10S14.52 2 9 2z"/></svg>
+                        </div>
+                        <div id="camera-live-btn" class="cam-top-btn" title="Live">
+                            <svg viewBox="0 0 24 24" fill="white" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
+                        </div>
+                        <div id="camera-close-btn" class="cam-top-btn" title="Fermer">
+                            <svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </div>
+                    </div>
+                    <div id="camera-spacer"></div>
+                    <div id="camera-modes">
+                        <span class="cam-mode">VIDEO</span>
+                        <span class="cam-mode active">PHOTO</span>
+                    </div>
+                    <div id="camera-bottom-bar">
+                        <div id="camera-gallery-preview">
+                            <svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)" width="20" height="20"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        </div>
+                        <div id="camera-shutter">
+                            <div id="camera-shutter-inner"></div>
+                        </div>
+                        <div id="camera-switch-btn" title="Changer camera">
+                            <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M9.4 10.5l4.77-8.26C13.47 2.09 12.75 2 12 2c-2.4 0-4.6.85-6.32 2.25l3.66 6.35.06-.1zM21.54 9c-.92-2.92-3.15-5.26-6-6.34L11.88 9h9.66zm.26 1h-7.49l.29.5 4.76 8.25C21 16.97 22 14.61 22 12c0-.69-.07-1.35-.2-2zM8.54 12l-3.9-6.75C3.01 7.03 2 9.39 2 12c0 .69.07 1.35.2 2h7.49l-1.15-2zm-6.08 3c.92 2.92 3.15 5.26 6 6.34L12.12 15H2.46zm11.27 0l-3.9 6.76c.7.15 1.42.24 2.17.24 2.4 0 4.6-.85 6.32-2.25l-3.66-6.35-.93 1.6z"/></svg>
+                        </div>
+                    </div>
+                    <div id="camera-front-label" class="hidden">SELFIE</div>
+                </div>
+
+                <div id="camera-flash-overlay"></div>
+
+                <!-- Ecran de configuration initiale -->
+                <div id="setup-screen" class="screen-hidden">
+                    <div class="setup-container">
+                        <div class="setup-icon">
+                            <svg viewBox="0 0 24 24" fill="white" width="48" height="48"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        </div>
+                        <h2 class="setup-title">Bienvenue !</h2>
+                        <p class="setup-subtitle">Configure ton telephone en choisissant ton numero</p>
+                        <div class="setup-name-display">
+                            <span class="setup-name-label">Ton nom</span>
+                            <span class="setup-name-value" id="setup-player-name">Joueur</span>
+                        </div>
+                        <div class="form-group" style="width: 100%;">
+                            <label class="form-label">Ton numero</label>
+                            <input type="text" id="input-setup-number" class="form-input" placeholder="Ex: 061-2345" maxlength="15" autocomplete="off">
+                        </div>
+                        <div id="setup-number-status" class="setup-status hidden"></div>
+                        <button class="form-btn setup-btn" id="btn-confirm-setup" disabled>Confirmer</button>
+                        <div id="setup-error" class="form-error hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Ecran d'accueil -->
+                <div id="home-screen" class="screen-hidden">
+                    <div id="home-time">12:00</div>
+                    <div id="home-date">Lundi 1 Janvier</div>
+
+                    <div id="app-grid">
+                        <div class="app-icon" data-app="contacts">
+                            <div class="app-icon-img">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <span class="app-label">Contacts</span>
+                        </div>
+                        <div class="app-icon" data-app="messages">
+                            <div class="app-icon-img">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                            </div>
+                            <span class="app-label">Messages</span>
+                        </div>
+                        <div class="app-icon" data-app="appels">
+                            <div class="app-icon-img">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                            </div>
+                            <span class="app-label">Appels</span>
+                        </div>
+                        <div class="app-icon" data-app="camera" onclick="openCameraFromUI()">
+                            <div class="app-icon-img">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                            </div>
+                            <span class="app-label">Camera</span>
+                        </div>
+                        <div class="app-icon" data-app="maps">
+                            <div class="app-icon-img">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            </div>
+                            <span class="app-label">Maps</span>
+                        </div>
+                        <div class="app-icon" data-app="gallery">
+                            <div class="app-icon-img">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                            </div>
+                            <span class="app-label">Photos</span>
+                        </div>
+                        <div class="app-icon" data-app="services">
+                            <div class="app-icon-img app-icon-services">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+                            </div>
+                            <span class="app-label">Services</span>
+                        </div>
+                        <div class="app-icon" data-app="settings">
+                            <div class="app-icon-img">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                            </div>
+                            <span class="app-label">Reglages</span>
+                        </div>
+                        <div class="app-icon" data-app="music">
+                            <div class="app-icon-img">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                            </div>
+                            <span class="app-label">Musique</span>
+                        </div>
+                    </div>
+                    <div id="home-indicator">
+                        <div class="home-indicator-line"></div>
+                    </div>
+                </div>
+
+                <!-- ==================== ECRAN CONTACTS ==================== -->
+                <div id="contacts-screen" class="screen-hidden">
+                    <div class="app-header">
+                        <div class="app-header-back" id="contacts-back">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        </div>
+                        <span class="app-header-title">Contacts</span>
+                        <div class="app-header-action" id="contacts-add-btn">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Mon profil en haut -->
+                    <div id="my-profile-card">
+                        <div class="profile-avatar">
+                            <svg viewBox="0 0 24 24" fill="white" width="28" height="28"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="profile-info">
+                            <span class="profile-name" id="my-profile-name">Mon Profil</span>
+                            <span class="profile-number" id="my-profile-number">...</span>
+                        </div>
+                        <div class="profile-expand" id="my-profile-toggle">
+                            <svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)" width="18" height="18"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Sous-menu profil -->
+                    <div id="my-profile-details" class="hidden">
+                        <div class="profile-detail-row">
+                            <span class="detail-label">Nom</span>
+                            <span class="detail-value" id="detail-my-name">-</span>
+                        </div>
+                        <div class="profile-detail-row">
+                            <span class="detail-label">Numero</span>
+                            <span class="detail-value" id="detail-my-number">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Liste des contacts -->
+                    <div id="contacts-list">
+                        <div class="contacts-empty">Aucun contact</div>
+                    </div>
+                </div>
+
+                <!-- ==================== FORMULAIRE AJOUT CONTACT ==================== -->
+                <div id="add-contact-screen" class="screen-hidden">
+                    <div class="app-header">
+                        <div class="app-header-back" id="add-contact-back">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        </div>
+                        <span class="app-header-title">Nouveau Contact</span>
+                        <div class="app-header-action" style="opacity:0; pointer-events:none;">
+                            <svg viewBox="0 0 24 24" width="20" height="20"></svg>
+                        </div>
+                    </div>
+                    <div class="form-container">
+                        <div class="form-avatar">
+                            <svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.6)" width="48" height="48"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nom</label>
+                            <input type="text" id="input-contact-name" class="form-input" placeholder="Nom du contact" maxlength="64" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Numero</label>
+                            <input type="text" id="input-contact-number" class="form-input" placeholder="Ex: 061-2345" maxlength="15" autocomplete="off">
+                        </div>
+                        <button class="form-btn" id="btn-save-contact">Enregistrer</button>
+                        <div id="add-contact-error" class="form-error hidden"></div>
+                    </div>
+                </div>
+
+                <!-- ==================== ECRAN MESSAGES (liste conversations) ==================== -->
+                <div id="messages-screen" class="screen-hidden">
+                    <div class="app-header">
+                        <div class="app-header-back" id="messages-back">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        </div>
+                        <span class="app-header-title">Messages</span>
+                        <div class="app-header-action" id="new-message-btn">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </div>
+                    </div>
+                    <div id="conversations-list">
+                        <div class="conversations-empty">Aucune conversation</div>
+                    </div>
+                </div>
+
+                <!-- ==================== ECRAN CONVERSATION (chat) ==================== -->
+                <div id="chat-screen" class="screen-hidden">
+                    <div class="app-header chat-header">
+                        <div class="app-header-back" id="chat-back">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        </div>
+                        <div class="chat-header-info">
+                            <span class="chat-header-name" id="chat-contact-name">Contact</span>
+                            <span class="chat-header-number" id="chat-contact-number">...</span>
+                        </div>
+                        <div class="app-header-action" style="opacity:0; pointer-events:none;">
+                            <svg viewBox="0 0 24 24" width="20" height="20"></svg>
+                        </div>
+                    </div>
+                    <div id="chat-messages"></div>
+                    <div id="chat-input-bar">
+                        <input type="text" id="chat-input" class="chat-text-input" placeholder="Message..." maxlength="500" autocomplete="off">
+                        <div id="chat-gps-btn" title="Envoyer ma position GPS">
+                            <svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        </div>
+                        <div id="chat-send-btn">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== NOUVEAU MESSAGE (choisir destinataire) ==================== -->
+                <div id="new-message-screen" class="screen-hidden">
+                    <div class="app-header">
+                        <div class="app-header-back" id="new-msg-back">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        </div>
+                        <span class="app-header-title">Nouveau Message</span>
+                        <div class="app-header-action" style="opacity:0; pointer-events:none;">
+                            <svg viewBox="0 0 24 24" width="20" height="20"></svg>
+                        </div>
+                    </div>
+                    <div class="form-group" style="padding: 12px 16px 0;">
+                        <input type="text" id="input-msg-number" class="form-input" placeholder="Numero du destinataire" maxlength="15" autocomplete="off">
+                    </div>
+                    <div id="new-msg-contacts-list"></div>
+                </div>
+
+                <!-- ==================== ECRAN SERVICES ==================== -->
+                <div id="services-screen" class="screen-hidden">
+                    <div class="app-header">
+                        <div class="app-header-back" id="services-back">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        </div>
+                        <span class="app-header-title">Services</span>
+                        <div style="width: 32px;"></div>
+                    </div>
+                    <div id="services-list"></div>
+                </div>
+
+                <!-- ==================== ECRAN CHAT SERVICE ==================== -->
+                <div id="service-chat-screen" class="screen-hidden">
+                    <div class="app-header">
+                        <div class="app-header-back" id="service-chat-back">
+                            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        </div>
+                        <div class="chat-header-info">
+                            <span class="chat-header-name" id="service-chat-name">Service</span>
+                            <span class="chat-header-number" id="service-chat-job">...</span>
+                        </div>
+                        <div style="width: 32px;"></div>
+                    </div>
+                    <div id="service-chat-messages"></div>
+                    <div class="chat-input-bar">
+                        <input type="text" class="chat-text-input" id="service-chat-input" placeholder="Message..." maxlength="500" autocomplete="off">
+                        <div id="service-chat-send-btn">
+                            <svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== ECRAN APPEL SORTANT ==================== -->
+                <div id="call-outgoing-screen" class="screen-hidden">
+                    <div class="call-screen-bg">
+                        <div class="call-status-text">Appel en cours...</div>
+                        <div class="call-avatar-large" id="call-out-avatar">?</div>
+                        <div class="call-contact-name" id="call-out-name">Contact</div>
+                        <div class="call-contact-number" id="call-out-number">...</div>
+                        <div class="call-timer" id="call-out-timer"></div>
+                        <div class="call-actions">
+                            <div class="call-action-btn call-hangup-btn" id="call-out-hangup">
+                                <svg viewBox="0 0 24 24" fill="white" width="28" height="28"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== ECRAN APPEL ENTRANT ==================== -->
+                <div id="call-incoming-screen" class="screen-hidden">
+                    <div class="call-screen-bg">
+                        <div class="call-status-text">Appel entrant</div>
+                        <div class="call-avatar-large call-avatar-ring" id="call-in-avatar">?</div>
+                        <div class="call-contact-name" id="call-in-name">Contact</div>
+                        <div class="call-contact-number" id="call-in-number">...</div>
+                        <div class="call-actions call-actions-incoming">
+                            <div class="call-action-btn call-reject-btn" id="call-in-reject">
+                                <svg viewBox="0 0 24 24" fill="white" width="28" height="28"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+                            </div>
+                            <div class="call-action-btn call-accept-btn" id="call-in-accept">
+                                <svg viewBox="0 0 24 24" fill="white" width="28" height="28"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== ECRAN EN APPEL ==================== -->
+                <div id="call-active-screen" class="screen-hidden">
+                    <div class="call-screen-bg">
+                        <div class="call-status-text call-status-connected">En appel</div>
+                        <div class="call-avatar-large" id="call-active-avatar">?</div>
+                        <div class="call-contact-name" id="call-active-name">Contact</div>
+                        <div class="call-contact-number" id="call-active-number">...</div>
+                        <div class="call-timer" id="call-active-timer">00:00</div>
+                        <div class="call-controls">
+                            <div class="call-control-btn" id="call-mute-btn" data-active="false">
+                                <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                                <span class="call-control-label">Muet</span>
+                            </div>
+                            <div class="call-control-btn" id="call-speaker-btn" data-active="false">
+                                <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                <span class="call-control-label">HP</span>
+                            </div>
+                        </div>
+                        <div class="call-actions">
+                            <div class="call-action-btn call-hangup-btn" id="call-active-hangup">
+                                <svg viewBox="0 0 24 24" fill="white" width="28" height="28"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Dock en bas -->
+            <div id="dock">
+                <div class="dock-icon phone-dock" id="dock-phone">
+                    <svg viewBox="0 0 24 24" fill="white" width="24" height="24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                </div>
+                <div class="dock-icon messages-dock" id="dock-messages">
+                    <svg viewBox="0 0 24 24" fill="white" width="24" height="24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                </div>
+                <div class="dock-icon camera-dock" onclick="openCameraFromUI()">
+                    <svg viewBox="0 0 24 24" fill="white" width="24" height="24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
