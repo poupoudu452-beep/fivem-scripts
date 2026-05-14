@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permis de Conduire</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Notifications (gauche de l'écran) -->
+    <div id="notif-container"></div>
+
+    <!-- Quiz overlay -->
+    <div id="quiz-overlay" class="hidden">
+        <div id="quiz-container">
+            <div id="quiz-header">
+                <div id="quiz-icon">&#128663;</div>
+                <h1>Examen du Code de la Route</h1>
+                <div id="quiz-progress">
+                    <span id="progress-text">Question 1/10</span>
+                    <div id="progress-bar">
+                        <div id="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-body">
+                <div id="question-text"></div>
+                <div id="choices-container"></div>
+            </div>
+
+            <div id="quiz-footer">
+                <div id="score-display">
+                    <span id="score-correct">&#10003; 0</span>
+                    <span id="score-wrong">&#10007; 0</span>
+                </div>
+                <button id="btn-next" class="hidden" onclick="nextQuestion()">Suivant &#8594;</button>
+                <button id="btn-close" onclick="closeQuiz()">Abandonner</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
